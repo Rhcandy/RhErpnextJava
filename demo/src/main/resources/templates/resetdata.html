@@ -1,0 +1,76 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{/general/headimport.html}"></head> 
+
+<body class="g-sidenav-show   bg-gray-100">
+
+  
+
+  <div class="min-height-300 bg-dark position-absolute w-100"></div>
+    <th:block th:replace="~{/general/aside.html}"></th:block> 
+
+    <main class="main-content position-relative border-radius-lg ">
+      <!-- Navbar -->
+      <th:block th:replace="~{/general/navbar.html}"></th:block>
+      <!-- End Navbar -->
+      <div class="container-fluid ">
+        <div class="row mt-2">
+            <div class="row">
+              <div class="col-md-12 d-flex justify-content-end">
+                <div th:if="${message}" class="alert alert-success alert-dismissible fade show col-md-6 float-end" role="alert">
+                      <span class="alert-text" th:text="${message}"></span>
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+                <!-- Import CSV Files -->
+              <div class="col-md-8">
+                  <div class="card shadow-lg mb-4">
+                      <div class="card-body">
+                          <h3 class="card-title mb-4 text-center">Import CSV Files</h3>
+                          <form method="post" action="/data/import" enctype="multipart/form-data">
+                              <div class="mb-3">
+                                  <label for="items_file" class="form-label">Items File</label>
+                                  <input type="file" id="items_file" name="items_file" accept=".csv" class="form-control" required>
+                              </div>
+                              <div class="mb-3">
+                                  <label for="suppliers_file" class="form-label">Suppliers File</label>
+                                  <input type="file" id="suppliers_file" name="suppliers_file" accept=".csv" class="form-control" required>
+                              </div>
+                              <div class="mb-3">
+                                  <label for="quotations_file" class="form-label">Quotations File</label>
+                                  <input type="file" id="quotations_file" name="quotations_file" accept=".csv" class="form-control" required>
+                              </div>
+                              <div class="text-center">
+                                  <button type="submit" class="btn btn-primary">Import</button>
+                              </div>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Reset Data -->
+              <div class="col-md-4">
+                  <div class="card shadow-lg mb-4">
+                      <div class="card-body text-center">
+                          <h3 class="card-title mb-4">Reset Data</h3>
+                          <form method="post" action="/data/reset">
+                              <button type="submit" class="btn btn-danger">
+                                  Reset
+                              </button>
+                          </form>
+                      </div>
+                  </div>
+              </div>
+
+              
+            </div>
+        </div>
+      </div>
+    </main>
+
+    <th:block th:replace="~{/general/fixed-plugin.html}"></th:block>
+    
+<th:block th:replace="~{/general/footer.html}"></th:block>

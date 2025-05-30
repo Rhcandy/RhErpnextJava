@@ -1,0 +1,152 @@
+package rhjava.erpnext.demo.service;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import rhjava.erpnext.demo.config.ERPNextConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.http.HttpSession;
+
+
+import java.net.URI;
+import java.net.URLEncoder;
+import lombok.Data;
+
+@Service
+public class ERPNextService {
+    private final ERPNextConfig erpNextConfig;
+    private final RestTemplate restTemplate;
+
+    public ERPNextService(ERPNextConfig erpNextConfig, RestTemplateBuilder restTemplateBuilder) {
+        this.erpNextConfig = erpNextConfig;
+        this.restTemplate = restTemplateBuilder.build();
+    }
+
+    public <T> List<T> getList(HttpSession session, String resource, Class<T> type) {
+        try {
+            String encodedResource = URLEncoder.encode(resource, StandardCharsets.UTF_8.name());
+            String url = erpNextConfig.getApiUrl() + "/resource/" + encodedResource;
+            HttpEntity<String> request = new HttpEntity<>(erpNextConfig.createHeaders(session));
+            
+            ResponseEntity<ERPListResponse<T>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<ERPListResponse<T>>() {}
+            );
+            return response.getBody().getData();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la récupération des données", e);
+        }
+    }
+
+    public <T> List<T> getListByFilter(HttpSession session, String resource, String filtersJson, Class<T> type) {
+        try {
+            URI url = UriComponentsBuilder.fromHttpUrl(erpNextConfig.getApiUrl())
+                .pathSegment("resource", resource)
+                .queryParam("filters", filtersJson)
+                .build()
+                .encode(StandardCharsets.UTF_8)
+                .toUri();
+    
+            System.out.println("Final URL: " + url);
+    
+            HttpEntity<String> request = new HttpEntity<>(erpNextConfig.createHeaders(session));
+            ResponseEntity<ERPListResponse<T>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<ERPListResponse<T>>() {}
+            );
+            return response.getBody().getData();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la récupération des données", e);
+        }
+    }
+    
+    
+
+    public <T> List<T> getListByFilterWithFields(HttpSession session, String resource, String filtersJson, List<String> fields ,Class<T> type) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String fieldsJson= mapper.writeValueAsString(fields);
+
+           URI url = UriComponentsBuilder.fromHttpUrl(erpNextConfig.getApiUrl())
+                .pathSegment("resource", resource)
+                .queryParam("filters", filtersJson)
+                .queryParam("fields", fieldsJson)
+                .build()
+                .encode(StandardCharsets.UTF_8)
+                .toUri();
+
+            System.out.println("Final URL: " + url);
+    
+            HttpEntity<String> request = new HttpEntity<>(erpNextConfig.createHeaders(session));
+            ResponseEntity<ERPListResponse<T>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<ERPListResponse<T>>() {}
+            );
+            return response.getBody().getData();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la récupération des données", e);
+        }
+    }
+    
+    public <T> List<T> getListWithFields(HttpSession session, String resource, List<String> fields, Class<T> type) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String fieldsJson = mapper.writeValueAsString(fields);
+
+            URI url = UriComponentsBuilder.fromHttpUrl(erpNextConfig.getApiUrl())
+                .pathSegment("resource", resource)
+                .queryParam("fields", fieldsJson)
+                .build()
+                .encode(StandardCharsets.UTF_8)
+                .toUri();
+
+            System.out.println("Final URL: " + url);
+
+            HttpEntity<String> request = new HttpEntity<>(erpNextConfig.createHeaders(session));
+            ResponseEntity<ERPListResponse<T>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<ERPListResponse<T>>() {}
+            );
+            return response.getBody().getData();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la récupération des données", e);
+        }
+    }
+
+    public <T> T getDetail(HttpSession session, String resource, String name, Class<T> type) {
+        String url = erpNextConfig.getApiUrl() + "/resource/" + resource + "/" + name;
+        HttpEntity<String> request = new HttpEntity<>(erpNextConfig.createHeaders(session));
+        
+        ParameterizedTypeReference<Map<String, Object>> responseType = new ParameterizedTypeReference<>() {};
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(url, HttpMethod.GET, request, responseType);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Object dataObj = response.getBody().get("data");
+        return mapper.convertValue(dataObj, type); 
+    }
+
+    // Classes pour le mapping JSON
+    @Data
+    public static class ERPListResponse<T> {
+        private List<T> data;
+    }
+}
