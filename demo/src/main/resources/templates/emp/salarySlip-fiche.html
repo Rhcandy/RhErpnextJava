@@ -1,0 +1,231 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{/general/headimport.html}"></head>
+<body class="g-sidenav-show bg-gray-100">
+
+<div class="min-height-300 bg-dark position-absolute w-100"></div>
+<th:block th:replace="~{/general/aside.html}"></th:block>
+
+<main class="main-content position-relative border-radius-lg">
+    <th:block th:replace="~{/general/navbar.html}"></th:block>
+
+    <div class="container-fluid py-4">
+        <div class="card border-0 shadow-sm" id="salary-slip-container">
+            <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1">Fiche de Paie</h5>
+                    <small class="text-muted" th:text="'Mois : ' + ${salarySlip.getMois()}"></small><br/>
+                    <small class="text-muted" th:text="'#' + ${salarySlip.name} + ' - ' + ${salarySlip.status}"></small>
+                </div>
+                <button id="export_pdf_btn" class="btn btn-outline-dark btn-sm" onclick="exportPDF()">
+                    <i class="fas fa-file-pdf me-1"></i> Exporter PDF
+                </button>
+            </div>
+
+
+            <div class="card-body">
+                <div class="row g-4">
+
+                    <!-- Informations Employé -->
+                    <div class="col-md-6">
+                        <div class="card border bg-light-subtle h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted">Informations Employé</h6>
+                                <p><strong>Nom :</strong> <span th:text="${salarySlip.employee_name}"></span></p>
+                                <p><strong>Devise :</strong> <span th:text="${salarySlip.currency}"></span></p>
+                                <p><strong>Mode de Paiement :</strong> <span th:text="${salarySlip.mode_of_payment}"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Période de Paie -->
+                    <div class="col-md-6">
+                        <div class="card border bg-light-subtle h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted">Période de Paie</h6>
+                                <p><strong>Début :</strong> <span th:text="${salarySlip.start_date}"></span></p>
+                                <p><strong>Fin :</strong> <span th:text="${salarySlip.end_date}"></span></p>
+                                <p><strong>Fréquence :</strong> <span th:text="${salarySlip.payroll_frequency}"></span></p>
+                                <p><strong>Structure :</strong> <span th:text="${salarySlip.salary_structure}"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Résumé Paie -->
+                    <div class="col-md-4">
+                        <div class="card border h-100 text-center">
+                            <div class="card-body">
+                                <h6 class="text-muted">Net à Payer</h6>
+                                <h4 class="fw-bold" th:text="${salarySlip.net_pay} + ' ' + ${salarySlip.currency}"></h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card border h-100 text-center">
+                            <div class="card-body">
+                                <h6 class="text-muted">Salaire Brut</h6>
+                                <h4 class="fw-bold" th:text="${salarySlip.gross_pay} + ' ' + ${salarySlip.currency}"></h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card border h-100 text-center">
+                            <div class="card-body">
+                                <h6 class="text-muted">Déductions</h6>
+                                <h4 class="fw-bold" th:text="${salarySlip.total_deduction} + ' ' + ${salarySlip.currency}"></h4>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block th:replace="~{/general/fixed-plugin.html}"></th:block>
+<th:block th:replace="~{/general/footer.html}"></th:block>
+
+<script th:inline="javascript">
+    async function exportPDF2() {
+        const salarySlipName = /*[[${salarySlip.employee_name}]]*/ 'Employe';
+
+        const element = document.getElementById('salary-slip-container');
+        const exportBtn = document.getElementById('export_pdf_btn');
+
+        // Cacher le bouton
+        if (exportBtn) exportBtn.style.display = 'none';
+
+        const opt = {
+            margin:       0.5,
+            filename:     `Fiche_Paie_${salarySlipName}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+        };
+
+        try {
+            await html2pdf().set(opt).from(element).save();
+        } catch (error) {
+            console.error("Erreur lors de la génération du PDF :", error);
+        } finally {
+            // Réafficher le bouton après la génération
+            if (exportBtn) exportBtn.style.display = 'inline-block';
+        }
+    }
+
+
+    async function exportPDF() {
+        const { jsPDF } = window.jspdf;
+
+        const salarySlip = {
+            name: /*[[${salarySlip.name}]]*/ '',
+            status: /*[[${salarySlip.status}]]*/ '',
+            payroll_frequency: /*[[${salarySlip.payroll_frequency}]]*/ '',
+            net_pay: /*[[${salarySlip.net_pay}]]*/ 0,
+            start_date: /*[[${salarySlip.start_date}]]*/ '',
+            end_date: /*[[${salarySlip.end_date}]]*/ '',
+            salary_structure: /*[[${salarySlip.salary_structure}]]*/ '',
+            mode_of_payment: /*[[${salarySlip.mode_of_payment}]]*/ '',
+            total_working_days: /*[[${salarySlip.total_working_days}]]*/ 0,
+            gross_pay: /*[[${salarySlip.gross_pay}]]*/ 0,
+            total_deduction: /*[[${salarySlip.total_deduction}]]*/ 0,
+            employee_name: /*[[${salarySlip.employee_name}]]*/ '',
+            currency: /*[[${salarySlip.currency}]]*/ '',
+            mois: /*[[${salarySlip.getMois()}]]*/ ''  // <-- ajout ici
+        };
+
+        const doc = new jsPDF();
+        let y = 20;
+
+        // En-tête
+        doc.setFontSize(20);
+        doc.setTextColor(33, 37, 41);
+        doc.text("Fiche de Paie", 105, y, { align: "center" });
+        y += 10;
+
+        // Affichage du mois sous le titre
+        doc.setFontSize(14);
+        doc.setTextColor(70, 70, 70);
+        doc.text(`Mois : ${salarySlip.mois}`, 105, y, { align: "center" });
+        y += 10;
+
+        doc.setDrawColor(200);
+        doc.line(20, y, 190, y);
+        y += 10;
+
+        // Infos Employé
+        doc.setFontSize(14);
+        doc.setTextColor(52, 58, 64);
+        doc.text("Informations de l'employé", 20, y);
+        y += 5;
+        doc.setDrawColor(220);
+        doc.setFillColor(245, 245, 245);
+        doc.roundedRect(15, y, 180, 40, 2, 2, 'F');
+        y += 10;
+        doc.setFontSize(11);
+        doc.setTextColor(0);
+        doc.text(`Nom : ${salarySlip.employee_name}`, 20, y);
+        doc.text(`Devise : ${salarySlip.currency}`, 120, y);
+        y += 8;
+        doc.text(`Structure : ${salarySlip.salary_structure}`, 20, y);
+        doc.text(`Mode de paiement : ${salarySlip.mode_of_payment}`, 120, y);
+        y += 8;
+        doc.text(`Période : ${salarySlip.start_date} -> ${salarySlip.end_date}`, 20, y);
+        doc.text(`Fréquence : ${salarySlip.payroll_frequency}`, 120, y);
+        y += 8;
+        doc.text(`Jours travaillés : ${salarySlip.total_working_days}`, 20, y);
+        y += 12;
+
+        // Détails de Paie
+        doc.setFontSize(14);
+        doc.setTextColor(52, 58, 64);
+        doc.text("Détails de paie", 20, y);
+        y += 5;
+        doc.setDrawColor(220);
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(15, y, 180, 30, 2, 2, 'F');
+        y += 10;
+        doc.setFontSize(11);
+        doc.setTextColor(33, 37, 41);
+        doc.text(`Salaire brut :`, 20, y);
+        doc.text(`${salarySlip.gross_pay} ${salarySlip.currency}`, 60, y);
+        y += 8;
+        doc.text(`Déductions :`, 20, y);
+        doc.text(`${salarySlip.total_deduction} ${salarySlip.currency}`, 60, y);
+        y += 8;
+        doc.setTextColor(0, 100, 0);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Net à payer :`, 20, y);
+        doc.text(`${salarySlip.net_pay} ${salarySlip.currency}`, 60, y);
+        doc.setFont('helvetica', 'normal');
+        y += 15;
+
+        // Références
+        doc.setFontSize(14);
+        doc.setTextColor(52, 58, 64);
+        doc.text("Informations complémentaires", 20, y);
+        y += 5;
+        doc.setDrawColor(220);
+        doc.setFillColor(248, 249, 250);
+        doc.roundedRect(15, y, 180, 15, 2, 2, 'F');
+        y += 10;
+        doc.setFontSize(11);
+        doc.setTextColor(0);
+        doc.text(`Statut : ${salarySlip.status}`, 20, y);
+        doc.text(`Référence : ${salarySlip.name}`, 120, y);
+
+        // Pied de page
+        doc.setFontSize(10);
+        doc.setTextColor(150);
+        doc.text("Document généré automatiquement - confidentiel", 105, 285, { align: "center" });
+
+        doc.save(`Fiche_Paie_${salarySlip.employee_name}.pdf`);
+    }
+
+
+</script>
+
+</body>
+</html>

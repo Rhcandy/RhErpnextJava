@@ -42,7 +42,7 @@
                         <thead>
                             <tr>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
-                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Période</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Mois</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Net à payer</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Statut</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
@@ -54,7 +54,7 @@
                                 <span th:text="${slip.name}">Id</span>
                             </td>
                             <td>
-                                <span th:text="${slip.payroll_frequency}">Mensuel</span>
+                                <span th:text="${slip.getMoisOnly()}">--</span>
                             </td>
                             <td>
                                 <span th:text="${slip.net_pay + ' €'}">0.00 €</span>

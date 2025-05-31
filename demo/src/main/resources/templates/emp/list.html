@@ -35,21 +35,19 @@
                     <tbody>
                         <tr th:each="emp : ${list}">
                             <td>
-                            <div class="d-flex px-2 py-1">
-                                <div class="d-flex flex-column justify-content-center">
-                                    <h6 class="mb-0 text-xs" th:text="${emp.employee_name}">Employee Name</h6>
-                                    <p class="text-xs text-secondary mb-0" th:text="${emp.name}">emp_code</p>
+                                <div class="d-flex px-2 py-1">
+                                    <div class="d-flex flex-column justify-content-center">
+                                        <h6 class="mb-0 text-xs" th:text="${emp.employee_name}">Employee Name</h6>
+                                        <p class="text-xs text-secondary mb-0" th:text="${emp.name}">emp_code</p>
+                                    </div>
                                 </div>
-                            </div>
                             </td>
                             <td>
                                 <p class="text-xs font-weight-bold mb-0" th:text="${emp.designation}">Designation</p>
                                 <p class="text-xs text-secondary mb-0" th:text="${emp.department}">Department</p> 
-                                </td>
+                            </td>
                             <td class="align-middle text-center text-sm">
-                            <span th:classappend="${emp.status == 'Active'} ? 'badge badge-sm badge-success' : 'badge badge-sm badge-secondary'">
-                                <span th:text="${emp.status}">Status</span>
-                            </span>
+                                <span class="text-secondary text-xs font-weight-bold" th:text="${emp.status}">Status</span>
                             </td>
                                 <td class="align-middle text-center">
                                 <span class="text-secondary text-xs font-weight-bold" th:text="${emp.date_of_joining}">Date</span>
