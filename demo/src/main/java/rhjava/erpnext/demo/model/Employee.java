@@ -1,5 +1,8 @@
 package rhjava.erpnext.demo.model;
 
+
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Data;

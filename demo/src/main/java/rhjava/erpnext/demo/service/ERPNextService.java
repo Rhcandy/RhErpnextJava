@@ -40,7 +40,6 @@ public class ERPNextService {
             String encodedResource = URLEncoder.encode(resource, StandardCharsets.UTF_8.name());
             String url = erpNextConfig.getApiUrl() + "/resource/" + encodedResource;
             HttpEntity<String> request = new HttpEntity<>(erpNextConfig.createHeaders(session));
-            
             ResponseEntity<ERPListResponse<T>> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
