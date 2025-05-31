@@ -41,6 +41,7 @@
                         <table class="table align-items-center mb-0">
                         <thead>
                             <tr>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Période</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Net à payer</th>
                             <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Statut</th>
@@ -49,6 +50,9 @@
                         </thead>
                         <tbody>
                             <tr th:each="slip : ${salarySlipsList}">
+                            <td>
+                                <span th:text="${slip.name}">Id</span>
+                            </td>
                             <td>
                                 <span th:text="${slip.payroll_frequency}">Mensuel</span>
                             </td>
