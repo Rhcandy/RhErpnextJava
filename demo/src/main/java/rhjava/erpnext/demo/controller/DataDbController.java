@@ -25,6 +25,7 @@ public class DataDbController {
     @GetMapping
     public String Accueildata(HttpSession session,Model model) {
         model.addAttribute("activePage", "data");
+        model.addAttribute("pageTitle", "Base");
         return "resetdata";
     }
 
