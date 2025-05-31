@@ -13,59 +13,64 @@
       <th:block th:replace="~{/general/navbar.html}"></th:block>
       <!-- End Navbar -->
 
-      <div class="container-fluid ">
-        <div class="row">
-            <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header pb-0">
-                <h6>Employee table</h6>
-                </div>
-                <div class="card-body px-0 pt-0 pb-2">
-                <div class="table-responsive p-0">
-                    <table class="table align-items-center mb-0">
-                    <thead>
-                        <tr>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Employee</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Function</th>
-                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
-                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Employed</th>
-                        <th class="text-secondary opacity-7"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="emp : ${list}">
-                            <td>
-                            <div class="d-flex px-2 py-1">
-                                <div class="d-flex flex-column justify-content-center">
-                                    <h6 class="mb-0 text-xs" th:text="${emp.employee_name}">Employee Name</h6>
-                                    <p class="text-xs text-secondary mb-0" th:text="${emp.name}">emp_code</p>
-                                </div>
-                            </div>
-                            </td>
-                            <td>
-                            <p class="text-xs font-weight-bold mb-0" th:text="${emp.designation}">Designation</p>
-                            <p class="text-xs text-secondary mb-0"th:text="${emp.department}">Department</p> 
-                            </td>
-                            <td class="align-middle text-center text-sm">
-                            <span th:classappend="${emp.status == 'Active'} ? 'badge badge-sm badge-success' : 'badge badge-sm badge-secondary'">
-                                <span th:text="${emp.status}">Status</span>
-                            </span>
-                            </td>
-                            <td class="align-middle text-center">
-                            <span class="text-secondary text-xs font-weight-bold" th:text="${emp.date_of_joining}">Date</span>
-                            </td>
-                            <td class="align-middle">
-                                <a th:href="@{/employee/more(name=${emp.name})}" class="btn btn-primary btn-sm text-xs">Envoyer</a>
-                            </td>
-                        </tr>
-                    </tbody>
-                    </table>
+        <div class="container-fluid">
+            <!-- FICHE EMPLOYÉ -->
+            <div class="row mb-4">
+                <div class="col-lg-6">
+                <div class="card p-3">
+                    <h5 class="mb-3">Détails de l’employé</h5>
+                    <p><strong>Nom :</strong> <span th:text="${moredetail.employee_name}"></span></p>
+                    <p><strong>Matricule :</strong> <span th:text="${moredetail.name}"></span></p>
+                    <p><strong>Département :</strong> <span th:text="${moredetail.department}"></span></p>
+                    <p><strong>Poste :</strong> <span th:text="${moredetail.designation}"></span></p>
+                    <p><strong>Date d’entrée :</strong> <span th:text="${moredetail.date_of_joining}"></span></p>
+                    <p><strong>Status :</strong> <span th:text="${moredetail.status}"></span></p>
                 </div>
                 </div>
             </div>
+
+            <!-- FICHES DE PAIE -->
+            <div class="row">
+                <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header pb-0">
+                    <h6>Fiches de paie mensuelles</h6>
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0">
+                        <thead>
+                            <tr>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Période</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Net à payer</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Statut</th>
+                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="slip : ${salarySlipsList}">
+                            <td>
+                                <span th:text="${slip.payroll_frequency}">Mensuel</span>
+                            </td>
+                            <td>
+                                <span th:text="${slip.net_pay + ' €'}">0.00 €</span>
+                            </td>
+                            <td>
+                                <span th:text="${slip.status}">Draft</span>
+                            </td>
+                            <td>
+                                <a th:href="@{/employee/more/salarySlip(name=${slip.name})}" class="btn btn-outline-primary btn-sm">More</a>
+                            </td>
+                            </tr>
+                        </tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+                </div>
             </div>
         </div>
-      </div>
+
     </main>
 
     <th:block th:replace="~{/general/fixed-plugin.html}"></th:block>

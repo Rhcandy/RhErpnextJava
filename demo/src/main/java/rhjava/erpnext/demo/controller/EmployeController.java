@@ -30,9 +30,9 @@ public class EmployeController {
         model.addAttribute("list", employees);
         return "emp/list";
     }
-    
+
     @GetMapping("/more")
-    public String sendEmployee(HttpSession session,@RequestParam("name") String name, Model model) {
+    public String MoreDetailEmployee(HttpSession session,@RequestParam("name") String name, Model model) {
         String filters = "[[\"employee\", \"=\", \"" + name + "\"]]";
         List<String> fields = Arrays.asList("name", "status", "payroll_frequency", "net_pay");
         List<SalarySlip> emSlips=erpNextService.getListByFilterWithFields(null, "Salary Slip", filters, fields, SalarySlip.class);
@@ -42,4 +42,13 @@ public class EmployeController {
         model.addAttribute("moredetail", (Employee) erpNextService.getDetail(session, "Employee", name, Employee.class));
         return "emp/more"; 
     }
+
+    @GetMapping("/more/salarySlip")
+    public String MoreDetailSalarySlip(HttpSession session,@RequestParam("name") String name, Model model) {
+        model.addAttribute("activePage", "employee");
+        model.addAttribute("pageTitle", "Employee Salary Slip");
+        model.addAttribute("moredetail", (SalarySlip)erpNextService.getDetail(session,"Salary Slip", name, SalarySlip.class));
+        return "emp/more"; /* Page izay tinao anarany */
+    }
+
 }
