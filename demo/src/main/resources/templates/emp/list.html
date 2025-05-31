@@ -43,19 +43,19 @@
                             </div>
                             </td>
                             <td>
-                            <p class="text-xs font-weight-bold mb-0" th:text="${emp.designation}">Designation</p>
-                            <p class="text-xs text-secondary mb-0"th:text="${emp.department}">Department</p> 
-                            </td>
+                                <p class="text-xs font-weight-bold mb-0" th:text="${emp.designation}">Designation</p>
+                                <p class="text-xs text-secondary mb-0" th:text="${emp.department}">Department</p> 
+                                </td>
                             <td class="align-middle text-center text-sm">
                             <span th:classappend="${emp.status == 'Active'} ? 'badge badge-sm badge-success' : 'badge badge-sm badge-secondary'">
                                 <span th:text="${emp.status}">Status</span>
                             </span>
                             </td>
-                            <td class="align-middle text-center">
-                            <span class="text-secondary text-xs font-weight-bold" th:text="${emp.date_of_joining}">Date</span>
-                            </td>
+                                <td class="align-middle text-center">
+                                <span class="text-secondary text-xs font-weight-bold" th:text="${emp.date_of_joining}">Date</span>
+                                </td>
                             <td class="align-middle">
-                                <a th:href="@{/employee/more(name=${emp.name})}" class="btn btn-primary btn-sm text-xs">Envoyer</a>
+                                <a th:href="@{/employee/more(name=${emp.name})}" class="btn btn-primary btn-sm text-xs">Details</a>
                             </td>
                         </tr>
                     </tbody>

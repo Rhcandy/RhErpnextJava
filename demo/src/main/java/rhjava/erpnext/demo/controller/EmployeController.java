@@ -23,7 +23,7 @@ public class EmployeController {
 
     @GetMapping
     public String ListEmployer(HttpSession session,Model model) {
-        List<String> fields = Arrays.asList("name", "employee_name", "date_of_joining", "status","designation");
+        List<String> fields = Arrays.asList("name", "employee_name", "date_of_joining", "status","designation","department","designation","gender","date_of_birth","company","branch");
         List<Employee> employees=erpNextService.getListWithFields(session, "Employee", fields, Employee.class);
         model.addAttribute("activePage", "employee");
         model.addAttribute("pageTitle", "Employee");
@@ -32,10 +32,10 @@ public class EmployeController {
     }
 
     @GetMapping("/more")
-    public String MoreDetailEmployee(HttpSession session,@RequestParam("name") String name, Model model) {
+    public String MoreDetailEmployee(@RequestParam("name") String name, Model model,HttpSession session) {
         String filters = "[[\"employee\", \"=\", \"" + name + "\"]]";
         List<String> fields = Arrays.asList("name", "status", "payroll_frequency", "net_pay");
-        List<SalarySlip> emSlips=erpNextService.getListByFilterWithFields(null, "Salary Slip", filters, fields, SalarySlip.class);
+        List<SalarySlip> emSlips=erpNextService.getListByFilterWithFields(session, "Salary Slip", filters, fields, SalarySlip.class);
         model.addAttribute("activePage", "employee");
         model.addAttribute("pageTitle", "Employee");
         model.addAttribute("salarySlipsList", emSlips);
@@ -44,7 +44,7 @@ public class EmployeController {
     }
 
     @GetMapping("/more/salarySlip")
-    public String MoreDetailSalarySlip(HttpSession session,@RequestParam("name") String name, Model model) {
+    public String MoreDetailSalarySlip(@RequestParam("name") String name, Model model,HttpSession session) {
         model.addAttribute("activePage", "employee");
         model.addAttribute("pageTitle", "Employee Salary Slip");
         model.addAttribute("moredetail", (SalarySlip)erpNextService.getDetail(session,"Salary Slip", name, SalarySlip.class));
