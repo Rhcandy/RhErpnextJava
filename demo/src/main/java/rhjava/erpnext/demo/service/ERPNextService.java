@@ -1,8 +1,10 @@
 package rhjava.erpnext.demo.service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
@@ -93,19 +95,25 @@ public class ERPNextService {
             System.out.println("Final URL: " + url);
     
             HttpEntity<String> request = new HttpEntity<>(erpNextConfig.createHeaders(session));
-            ResponseEntity<ERPListResponse<T>> response = restTemplate.exchange(
+            ResponseEntity<ERPListResponse<LinkedHashMap>> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 request,
-                new ParameterizedTypeReference<ERPListResponse<T>>() {}
+                new ParameterizedTypeReference<ERPListResponse<LinkedHashMap>>() {}
             );
-            return response.getBody().getData();
+            List<LinkedHashMap> rawData = response.getBody().getData();
+            // On convertit chaque élément LinkedHashMap en T
+            List<T> typedData = rawData.stream()
+                .map(item -> mapper.convertValue(item, type))
+                .collect(Collectors.toList());
+
+            return typedData;
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors de la récupération des données", e);
         }
     }
     
-    public <T> List<T> getListWithFields(HttpSession session, String resource, List<String> fields, Class<T> type) {
+   public <T> List<T> getListWithFields(HttpSession session, String resource, List<String> fields, Class<T> type) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String fieldsJson = mapper.writeValueAsString(fields);
@@ -118,19 +126,27 @@ public class ERPNextService {
                 .toUri();
 
             System.out.println("Final URL: " + url);
-
             HttpEntity<String> request = new HttpEntity<>(erpNextConfig.createHeaders(session));
-            ResponseEntity<ERPListResponse<T>> response = restTemplate.exchange(
+            // On récupère d'abord une réponse avec List<LinkedHashMap>
+            ResponseEntity<ERPListResponse<LinkedHashMap>> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 request,
-                new ParameterizedTypeReference<ERPListResponse<T>>() {}
+                new ParameterizedTypeReference<ERPListResponse<LinkedHashMap>>() {}
             );
-            return response.getBody().getData();
+            List<LinkedHashMap> rawData = response.getBody().getData();
+            // On convertit chaque élément LinkedHashMap en T
+            List<T> typedData = rawData.stream()
+                .map(item -> mapper.convertValue(item, type))
+                .collect(Collectors.toList());
+
+            return typedData;
+
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors de la récupération des données", e);
         }
     }
+
 
     public <T> T getDetail(HttpSession session, String resource, String name, Class<T> type) {
         String url = erpNextConfig.getApiUrl() + "/resource/" + resource + "/" + name;
