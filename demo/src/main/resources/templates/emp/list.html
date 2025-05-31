@@ -127,6 +127,40 @@
             </div>
 
             <div class="col-12">
+            <div class="card mb-4 px-0 pt-0 pb-2">
+                <form method="get" action="/employee/filter" class="row row-cols-1 row-cols-md-4 g-3 mb-4 align-items-end">
+                    <div class="col">
+                        <label for="name" class="form-label">Code</label>
+                        <input type="text" name="name" id="name" class="form-control" placeholder="Employee Code">
+                    </div>
+                    <div class="col">
+                        <label for="employeeName" class="form-label">Employee Name</label>
+                        <input type="text" name="employeeName" id="employeeName" class="form-control" placeholder="Full Name">
+                    </div>
+                    <div class="col">
+                        <label for="department" class="form-label">Department</label>
+                        <input type="text" name="department" id="department" class="form-control" placeholder="Department">
+                    </div>
+                    <div class="col">
+                        <label for="designation" class="form-label">Designation</label>
+                        <input type="text" name="designation" id="designation" class="form-control" placeholder="Designation">
+                    </div>
+                    <div class="col">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" name="startDate" id="startDate" class="form-control">
+                    </div>
+                    <div class="col">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" name="endDate" id="endDate" class="form-control">
+                    </div>
+                    <div class="col d-grid">
+                        <button type="submit" class="btn btn-primary">Fetch</button>
+                    </div>
+                </form>
+            </div>
+            </div>
+
+            <div class="col-12">
             <div class="card mb-4">
                 <div class="card-header pb-0">
                 <h6>Employee table</h6>
