@@ -1,5 +1,9 @@
 package rhjava.erpnext.demo.service;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,5 +75,43 @@ public class DataService {
             return "❌ Exception lors de l’appel Frappe : " + e.getMessage();
         }
     }
+
+    public static String getCurrentMonthDateRange() {
+        // Obtenir l'année et le mois courant
+        YearMonth currentMonth = YearMonth.now();
+        // Début du mois : 1er
+        LocalDate startDate = currentMonth.atDay(1);
+        // Fin du mois : dernier jour du mois
+        LocalDate endDate = currentMonth.atEndOfMonth();
+        // Format AAAA-MM-JJ
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        // Retourner sous forme de chaîne utilisable dans l'API
+        return String.format(
+            "[[\"start_date\", \">=\", \"%s\"], [\"start_date\", \"<=\", \"%s\"]]",
+            startDate.format(formatter),
+            endDate.format(formatter)
+        );
+    }
+    public static String[] getStartAndEndDateFromMonthInput(String monthInput) {
+        try {
+            // Parse input au format yyyy-MM
+            YearMonth yearMonth = YearMonth.parse(monthInput); // ex: 2025-06
+
+            // Début du mois
+            LocalDate startDate = yearMonth.atDay(1);
+
+            // Fin du mois
+            LocalDate endDate = yearMonth.atEndOfMonth();
+
+            // Retourner les deux dates au format yyyy-MM-dd
+            return new String[]{
+                startDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                endDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+            };
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Mois invalide : " + monthInput);
+        }
+    }
+
 
 }

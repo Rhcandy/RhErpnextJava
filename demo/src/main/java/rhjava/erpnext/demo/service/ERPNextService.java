@@ -1,6 +1,7 @@
 package rhjava.erpnext.demo.service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,13 +41,22 @@ public class ERPNextService {
             String encodedResource = URLEncoder.encode(resource, StandardCharsets.UTF_8.name());
             String url = erpNextConfig.getApiUrl() + "/resource/" + encodedResource;
             HttpEntity<String> request = new HttpEntity<>(erpNextConfig.createHeaders(session));
-            ResponseEntity<ERPListResponse<T>> response = restTemplate.exchange(
+
+            ResponseEntity<ERPListResponse<LinkedHashMap>> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 request,
-                new ParameterizedTypeReference<ERPListResponse<T>>() {}
+                new ParameterizedTypeReference<ERPListResponse<LinkedHashMap>>() {}
             );
-            return response.getBody().getData();
+
+            ObjectMapper mapper = new ObjectMapper();
+            List<T> result = new ArrayList<>();
+            for (LinkedHashMap map : response.getBody().getData()) {
+                result.add(mapper.convertValue(map, type));
+            }
+
+            return result;
+
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors de la récupération des données", e);
         }
@@ -60,23 +70,32 @@ public class ERPNextService {
                 .build()
                 .encode(StandardCharsets.UTF_8)
                 .toUri();
-    
+
             System.out.println("Final URL: " + url);
-    
+
             HttpEntity<String> request = new HttpEntity<>(erpNextConfig.createHeaders(session));
-            ResponseEntity<ERPListResponse<T>> response = restTemplate.exchange(
+            ResponseEntity<ERPListResponse<LinkedHashMap>> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 request,
-                new ParameterizedTypeReference<ERPListResponse<T>>() {}
+                new ParameterizedTypeReference<ERPListResponse<LinkedHashMap>>() {}
             );
-            return response.getBody().getData();
+
+            // Mapper les LinkedHashMap en objets du type souhaité
+            ObjectMapper mapper = new ObjectMapper();
+            List<LinkedHashMap> rawList = response.getBody().getData();
+            List<T> result = new ArrayList<>();
+            for (LinkedHashMap map : rawList) {
+                T object = mapper.convertValue(map, type);
+                result.add(object);
+            }
+
+            return result;
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors de la récupération des données", e);
         }
     }
-    
-    
+
 
     public <T> List<T> getListByFilterWithFields(HttpSession session, String resource, String filtersJson, List<String> fields ,Class<T> type) {
         try {
@@ -164,4 +183,46 @@ public class ERPNextService {
     public static class ERPListResponse<T> {
         private List<T> data;
     }
+
+    public <T> List<T> getListByFilterOrder(
+        HttpSession session,
+        String resource,
+        String filtersJson,
+        String orderBy,         // nom de la colonne à trier
+        String orderType,       // "asc" ou "desc"
+        Class<T> type
+    ) {
+        try {
+            UriComponentsBuilder builder = UriComponentsBuilder
+                .fromHttpUrl(erpNextConfig.getApiUrl())
+                .pathSegment("resource", resource)
+                .queryParam("filters", filtersJson);
+
+            // Ajouter tri si les paramètres sont valides
+            if (orderBy != null && !orderBy.isEmpty() &&
+                orderType != null && (orderType.equalsIgnoreCase("asc") || orderType.equalsIgnoreCase("desc"))) {
+                builder.queryParam("order_by", orderBy + " " + orderType.toLowerCase());
+            }
+
+            URI url = builder
+                .build()
+                .encode(StandardCharsets.UTF_8)
+                .toUri();
+
+            System.out.println("Final URL: " + url);
+
+            HttpEntity<String> request = new HttpEntity<>(erpNextConfig.createHeaders(session));
+
+            ResponseEntity<ERPListResponse<T>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<ERPListResponse<T>>() {}
+            );
+            return response.getBody().getData();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur lors de la récupération des données", e);
+        }
+    }
+
 }

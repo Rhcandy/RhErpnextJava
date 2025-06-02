@@ -11,45 +11,21 @@
       <!-- End Navbar -->
       
       <div class="container-fluid py-4">
+
         <div class="row">
+
           <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
             <div class="card">
               <div class="card-body p-3">
                 <div class="row">
                   <div class="col-8">
                     <div class="numbers">
-                      <p class="text-sm mb-0 text-uppercase font-weight-bold">Today's Money</p>
-                      <h5 class="font-weight-bolder">
-                        $53,000
-                      </h5>
-                      <p class="mb-0">
-                        <span class="text-success text-sm font-weight-bolder">+55%</span>
-                        since yesterday
-                      </p>
-                    </div>
-                  </div>
-                  <div class="col-4 text-end">
-                    <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
-                      <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-              <div class="card-body p-3">
-                <div class="row">
-                  <div class="col-8">
-                    <div class="numbers">
-                      <p class="text-sm mb-0 text-uppercase font-weight-bold">Today's Users</p>
-                      <h5 class="font-weight-bolder">
+                      <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Employee</p>
+                      <h5 class="font-weight-bolder"th:text="${CountEmployee}">
                         2,300
                       </h5>
                       <p class="mb-0">
-                        <span class="text-success text-sm font-weight-bolder">+3%</span>
-                        since last week
+                        since creation
                       </p>
                     </div>
                   </div>
@@ -68,13 +44,37 @@
                 <div class="row">
                   <div class="col-8">
                     <div class="numbers">
-                      <p class="text-sm mb-0 text-uppercase font-weight-bold">New Clients</p>
-                      <h5 class="font-weight-bolder">
-                        +3,462
+                      <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Net Pay</p>
+                      <h5 class="font-weight-bolder" th:text="${!#lists.isEmpty(data) ? #numbers.formatDecimal(Total, 0, 'COMMA', 2, 'POINT') + ' ' + data[0].currency : #numbers.formatDecimal(Total, 0, 'COMMA', 2, 'POINT')}">
+                        0 MGA
                       </h5>
                       <p class="mb-0">
-                        <span class="text-danger text-sm font-weight-bolder">-2%</span>
-                        since last quarter
+                        <span class="text-success text-sm font-weight-bolder"th:text="${#lists.isEmpty(data) ? 'Current month' : data[0].getMois()}">MAI</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="col-4 text-end">
+                    <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
+                      <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+              <div class="card-body p-3">
+                <div class="row">
+                  <div class="col-8">
+                    <div class="numbers">
+                      <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Salary Slips Paid </p>
+                      <h5 class="font-weight-bolder"th:text="${CountSalary}">
+                        0
+                      </h5>
+                      <p class="mb-0">
+                        <span class="text-success text-sm font-weight-bolder"th:text="${#lists.isEmpty(data) ? 'current month' : data[0].getMois()}">MAI</span>
                       </p>
                     </div>
                   </div>
@@ -87,134 +87,121 @@
               </div>
             </div>
           </div>
-          <div class="col-xl-3 col-sm-6">
-            <div class="card">
-              <div class="card-body p-3">
-                <div class="row">
-                  <div class="col-8">
-                    <div class="numbers">
-                      <p class="text-sm mb-0 text-uppercase font-weight-bold">Sales</p>
-                      <h5 class="font-weight-bolder">
-                        $103,430
-                      </h5>
-                      <p class="mb-0">
-                        <span class="text-success text-sm font-weight-bolder">+5%</span> than last month
-                      </p>
-                    </div>
-                  </div>
-                  <div class="col-4 text-end">
-                    <div class="icon icon-shape bg-gradient-warning shadow-warning text-center rounded-circle">
-                      <i class="ni ni-cart text-lg opacity-10" aria-hidden="true"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          
         </div>
+
         <div class="row mt-4">
-          <div class="col-lg-7 mb-lg-0 mb-4">
-            <div class="card z-index-2 h-100">
-              <div class="card-header pb-0 pt-3 bg-transparent">
-                <h6 class="text-capitalize">Sales overview</h6>
-                <p class="text-sm mb-0">
-                  <i class="fa fa-arrow-up text-success"></i>
-                  <span class="font-weight-bold">4% more</span> in 2021
-                </p>
-              </div>
-              <div class="card-body p-3">
-                <div class="chart">
-                  <canvas id="chart-line" class="chart-canvas" height="300"></canvas>
-                </div>
+            <div class="col-12">
+              <div class="card mb-4">
+                  <div class="col-md-2 d-flex justify-content-end p-3">
+                    <form method="get" action="/Tabrecap" class="row g-3 align-items-end">
+                      <label for="month" class="form-label fw-bold small text-muted">Mois</label>
+                      <input type="month" name="month" id="month" class="form-control form-control-sm" placeholder="Month">
+                      <button type="submit" class="btn btn-secondary btn-sm">Find</button>
+                    </form>
+                  </div>
+                  <div class="card-header pb-0">
+                    <h3>Salary Slip</h3>
+                  </div>
+                  <div class="card-body px-0 pt-0 pb-2 mt-2" id="employee-container">
+                  <hr class="my-2" style="height:2px; background-color: black; border: none;">
+
+                    <div class="row" th:each="emp : ${data}">
+                        <!-- Colonne 1 : Infos principales -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 th:text="${emp.employee_name}" class="card-title">Information</h5>
+                                    <p class="mb-1"><strong>Code :</strong> <span th:text="${emp.name}"></span></p>
+                                    <p class="mb-1"><strong>Net Pay :</strong> <span th:text="${#numbers.formatDecimal(emp.net_pay, 0, 'COMMA', 2, 'POINT')} + ' ' + ${emp.currency}"></span></p>
+                                    <p class="mb-1"><strong>Gross Pay :</strong> <span th:text="${#numbers.formatDecimal(emp.gross_pay, 0, 'COMMA', 2, 'POINT')} + ' ' + ${emp.currency}"></span></p>
+                                    <p class="mb-1"><strong>Total Déduction :</strong> <span th:text="${#numbers.formatDecimal(emp.total_deduction, 0, 'COMMA', 2, 'POINT')} + ' ' + ${emp.currency}"></span></p>
+                                    <p class="mb-1"><strong>Month :</strong> <span th:text="${emp.getMois()}"></span></p>
+                                    <p class="mb-0"><strong>Status :</strong> <span th:text="${emp.status}"></span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Colonne 2 : Earnings / Deductions -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="text-muted text-uppercase small">Salary Structure</h6>
+                                    <div class="row">
+                                        <div class="col-6 bg-success">
+                                            <h6 class="text-center">Earnings</h6>
+                                            <table class="table table-sm " >
+                                                <tbody>
+                                                    <tr th:each="earn : ${emp.earnings}">
+                                                        <td th:text="${earn.salary_component}">Salaire de Base</td>
+                                                        <td th:text="${#numbers.formatDecimal(earn.default_amount, 0, 'COMMA', 2, 'POINT')} + ' ' + ${emp.currency}">0 MGA</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-6 bg-warning">
+                                            <h6 class="text-center">Deductions</h6>
+                                            <table class="table table-sm " >
+                                                <tbody>
+                                                    <tr th:each="deduct : ${emp.deductions}">
+                                                        <td th:text="${deduct.salary_component}">CNAPS</td>
+                                                        <td th:text="${#numbers.formatDecimal(deduct.default_amount, 0, 'COMMA', 2, 'POINT')} + ' ' + ${emp.currency}">0 MGA</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-2" style="height:2px; background-color: black; border: none;">
+
+                    </div>
+                  </div>
+                  <!-- Pagination controls -->
+                  <div class="d-flex justify-content-center mt-4">
+                      <button class="btn btn-sm btn-outline-primary me-2" onclick="prevPage()">Précédent</button>
+                      <span id="page-indicator" class="align-self-center"></span>
+                      <button class="btn btn-sm btn-outline-primary ms-2" onclick="nextPage()">Suivant</button>
+                  </div>
               </div>
             </div>
-          </div>
         </div>
       </div>
     </main>
 
     <th:block th:replace="~{/general/fixed-plugin.html}"></th:block>
     <script>
-      var ctx1 = document.getElementById("chart-line").getContext("2d");
+      const itemsPerPage = 3; // nombre d'items par page
+      let currentPage = 1;
 
-      var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
+      function showPage(page) {
+        const allRows = document.querySelectorAll('#employee-container > .row'); 
+        const totalPages = Math.ceil(allRows.length / itemsPerPage);
 
-      gradientStroke1.addColorStop(1, 'rgba(94, 114, 228, 0.2)');
-      gradientStroke1.addColorStop(0.2, 'rgba(94, 114, 228, 0.0)');
-      gradientStroke1.addColorStop(0, 'rgba(94, 114, 228, 0)');
-      new Chart(ctx1, {
-        type: "line",
-        data: {
-          labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-          datasets: [{
-            label: "Mobile apps",
-            tension: 0.4,
-            borderWidth: 0,
-            pointRadius: 0,
-            borderColor: "#5e72e4",
-            backgroundColor: gradientStroke1,
-            borderWidth: 3,
-            fill: true,
-            data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
-            maxBarThickness: 6
+        if (page < 1 || page > totalPages) return;
 
-          }],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false,
-            }
-          },
-          interaction: {
-            intersect: false,
-            mode: 'index',
-          },
-          scales: {
-            y: {
-              grid: {
-                drawBorder: false,
-                display: true,
-                drawOnChartArea: true,
-                drawTicks: false,
-                borderDash: [5, 5]
-              },
-              ticks: {
-                display: true,
-                padding: 10,
-                color: '#fbfbfb',
-                font: {
-                  size: 11,
-                  family: "Open Sans",
-                  style: 'normal',
-                  lineHeight: 2
-                },
-              }
-            },
-            x: {
-              grid: {
-                drawBorder: false,
-                display: false,
-                drawOnChartArea: false,
-                drawTicks: false,
-                borderDash: [5, 5]
-              },
-              ticks: {
-                display: true,
-                color: '#ccc',
-                padding: 20,
-                font: {
-                  size: 11,
-                  family: "Open Sans",
-                  style: 'normal',
-                  lineHeight: 2
-                },
-              }
-            },
-          },
-        },
+        currentPage = page;
+
+        allRows.forEach((row, index) => {
+          row.style.display = (index >= (page - 1) * itemsPerPage && index < page * itemsPerPage) ? 'flex' : 'none';
+        });
+
+        document.getElementById('page-indicator').innerText = `Page ${currentPage} / ${totalPages}`;
+      }
+
+      function nextPage() {
+        showPage(currentPage + 1);
+      }
+
+      function prevPage() {
+        showPage(currentPage - 1);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        showPage(1);
       });
     </script>
+
 <th:block th:replace="~{/general/footer.html}"></th:block>

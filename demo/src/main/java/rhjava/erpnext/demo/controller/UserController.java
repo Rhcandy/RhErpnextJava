@@ -1,6 +1,16 @@
 package rhjava.erpnext.demo.controller;
 
 import jakarta.servlet.http.HttpSession;
+import rhjava.erpnext.demo.model.Base;
+import rhjava.erpnext.demo.model.Employee;
+import rhjava.erpnext.demo.model.SalarySlip;
+import rhjava.erpnext.demo.service.DataService;
+import rhjava.erpnext.demo.service.ERPNextService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -10,6 +20,9 @@ import org.springframework.web.client.RestTemplate;
 
 @Controller
 public class UserController {
+    @Autowired
+    private ERPNextService erpNextService;
+   
 
     // Injecter l'URL de l'API ERPNext depuis application.properties
     @Value("${erpnext.api.url}")
@@ -46,10 +59,56 @@ public class UserController {
 
     @GetMapping("/home")
     public String home(HttpSession session, Model model) {
+        String filters=DataService.getCurrentMonthDateRange();
+
+        List<SalarySlip> salaryslips = new ArrayList<>();
+        List<Employee> employees=erpNextService.getList(session, "Employee", Employee.class);
+        List<Base> Bases=erpNextService.getListByFilter(session, "Salary Slip", filters, Base.class);
+        double total=0;
+        for (Base salaryslip : Bases) {
+            SalarySlip one=erpNextService.getDetail(session,"Salary Slip" , salaryslip.getName(), SalarySlip.class);
+            salaryslips.add(one);
+            total+=one.getNet_pay();
+        }
+        model.addAttribute("Total", total);
+        model.addAttribute("CountSalary", salaryslips.size());
+        model.addAttribute("CountEmployee", employees.size());
+        model.addAttribute("data", salaryslips);
         model.addAttribute("pageTitle", "Home");
         model.addAttribute("activePage", "home");
         return "home";
     }
+
+    @GetMapping("/Tabrecap")
+    public String filterEmployees(
+            @RequestParam(required = false) String month,
+            Model model,
+            HttpSession session) {
+
+        String filters=DataService.getCurrentMonthDateRange();
+
+        if (month != null && !month.isEmpty()) {
+            String[] dates = DataService.getStartAndEndDateFromMonthInput(month);
+            filters="[[\"start_date\", \">=\", \""+dates[0]+"\"], [\"start_date\", \"<=\", \""+ dates[1]+"\"]]";
+        }
+        List<SalarySlip> salaryslips = new ArrayList<>();
+        List<Employee> employees=erpNextService.getList(session, "Employee", Employee.class);
+        List<Base> Bases=erpNextService.getListByFilter(session, "Salary Slip", filters, Base.class);
+        double total=0;
+        for (Base salaryslip : Bases) {
+            SalarySlip one=erpNextService.getDetail(session,"Salary Slip" , salaryslip.getName(), SalarySlip.class);
+            salaryslips.add(one);
+            total+=one.getNet_pay();
+        }
+        model.addAttribute("Total", total);
+        model.addAttribute("CountSalary", salaryslips.size());
+        model.addAttribute("CountEmployee", employees.size());
+        model.addAttribute("data", salaryslips);
+        model.addAttribute("pageTitle", "Home");
+        model.addAttribute("activePage", "home");
+        return "home";
+    }
+
     
     @GetMapping("/logout")
     public String logout(HttpSession session) {

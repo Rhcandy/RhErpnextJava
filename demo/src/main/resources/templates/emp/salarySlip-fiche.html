@@ -29,7 +29,7 @@
                     <div class="col-md-6">
                         <div class="card border bg-light-subtle h-100">
                             <div class="card-body">
-                                <h6 class="text-muted">Informations Employé</h6>
+                                <h3 class="text-muted">Informations Employé</h3>
                                 <p><strong>Nom :</strong> <span th:text="${salarySlip.employee_name}"></span></p>
                                 <p><strong>Devise :</strong> <span th:text="${salarySlip.currency}"></span></p>
                                 <p><strong>Mode de Paiement :</strong> <span th:text="${salarySlip.mode_of_payment}"></span></p>
@@ -41,7 +41,7 @@
                     <div class="col-md-6">
                         <div class="card border bg-light-subtle h-100">
                             <div class="card-body">
-                                <h6 class="text-muted">Période de Paie</h6>
+                                <h3 class="text-muted">Période de Paie</h3>
                                 <p><strong>Début :</strong> <span th:text="${salarySlip.start_date}"></span></p>
                                 <p><strong>Fin :</strong> <span th:text="${salarySlip.end_date}"></span></p>
                                 <p><strong>Fréquence :</strong> <span th:text="${salarySlip.payroll_frequency}"></span></p>
@@ -55,7 +55,7 @@
                         <div class="card border h-100 text-center">
                             <div class="card-body">
                                 <h6 class="text-muted">Net à Payer</h6>
-                                <h4 class="fw-bold" th:text="${salarySlip.net_pay} + ' ' + ${salarySlip.currency}"></h4>
+                                <h4 class="fw-bold" th:text="${#numbers.formatDecimal(salarySlip.net_pay, 0, 'COMMA', 2, 'POINT')} + ' ' + ${salarySlip.currency}"></h4>
                             </div>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                         <div class="card border h-100 text-center">
                             <div class="card-body">
                                 <h6 class="text-muted">Salaire Brut</h6>
-                                <h4 class="fw-bold" th:text="${salarySlip.gross_pay} + ' ' + ${salarySlip.currency}"></h4>
+                                <h4 class="fw-bold" th:text="${#numbers.formatDecimal(salarySlip.gross_pay, 0, 'COMMA', 2, 'POINT')} + ' ' + ${salarySlip.currency}"></h4>
                             </div>
                         </div>
                     </div>
@@ -73,7 +73,7 @@
                         <div class="card border h-100 text-center">
                             <div class="card-body">
                                 <h6 class="text-muted">Déductions</h6>
-                                <h4 class="fw-bold" th:text="${salarySlip.total_deduction} + ' ' + ${salarySlip.currency}"></h4>
+                                <h4 class="fw-bold" th:text="${#numbers.formatDecimal(salarySlip.total_deduction, 0, 'COMMA', 2, 'POINT')} + ' ' + ${salarySlip.currency}"></h4>
                             </div>
                         </div>
                     </div>

@@ -96,7 +96,7 @@ public class EmployeController {
     @GetMapping("/more")
     public String MoreDetailEmployee(@RequestParam("name") String name, Model model,HttpSession session) {
         String filters = "[[\"employee\", \"=\", \"" + name + "\"]]";
-        List<String> fields = Arrays.asList("name", "status", "payroll_frequency", "net_pay", "start_date", "end_date");
+        List<String> fields = Arrays.asList("name", "status", "payroll_frequency", "net_pay", "start_date", "end_date","currency");
         List<SalarySlip> emSlips=erpNextService.getListByFilterWithFields(session, "Salary Slip", filters, fields, SalarySlip.class);
         List<Base> departements= erpNextService.getList(session, "Department", Base.class);
         List<Base> designations= erpNextService.getList(session, "Designation", Base.class);
@@ -117,5 +117,6 @@ public class EmployeController {
         model.addAttribute("salarySlip", (SalarySlip)erpNextService.getDetail(session,"Salary Slip", name, SalarySlip.class));
         return "emp/salarySlip-fiche";
     }
+
 
 }

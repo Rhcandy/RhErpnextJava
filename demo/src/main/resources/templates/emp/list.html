@@ -14,6 +14,7 @@
       <!-- End Navbar -->
 
       <div class="container-fluid ">
+        
             <div class="row">
                 <div class="col-12">
                 <div class="card mb-4 shadow-sm border-0">
@@ -146,58 +147,58 @@
 
     <th:block th:replace="~{/general/fixed-plugin.html}"></th:block>
     <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const rowsPerPage = 20;
-  const table = document.getElementById("employeeTable");
-  const tbody = table.querySelector("tbody");
-  const rows = tbody.querySelectorAll("tr");
-  const totalRows = rows.length;
+        document.addEventListener("DOMContentLoaded", function () {
+        const rowsPerPage = 20;
+        const table = document.getElementById("employeeTable");
+        const tbody = table.querySelector("tbody");
+        const rows = tbody.querySelectorAll("tr");
+        const totalRows = rows.length;
 
-  if (totalRows <= rowsPerPage) return; // No need to paginate
+        if (totalRows <= rowsPerPage) return; // No need to paginate
 
-  let currentPage = 1;
-  const totalPages = Math.ceil(totalRows / rowsPerPage);
+        let currentPage = 1;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
 
-  function showPage(page) {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    rows.forEach((row, index) => {
-      row.style.display = (index >= start && index < end) ? "" : "none";
-    });
-  }
+        function showPage(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            rows.forEach((row, index) => {
+            row.style.display = (index >= start && index < end) ? "" : "none";
+            });
+        }
 
-  function renderPagination() {
-    const paginationContainer = document.createElement("div");
-    paginationContainer.className = "d-flex justify-content-end mt-3";
+        function renderPagination() {
+            const paginationContainer = document.createElement("div");
+            paginationContainer.className = "d-flex justify-content-end mt-3";
 
-    const ul = document.createElement("ul");
-    ul.className = "pagination";
+            const ul = document.createElement("ul");
+            ul.className = "pagination";
 
-    for (let i = 1; i <= totalPages; i++) {
-      const li = document.createElement("li");
-      li.className = "page-item" + (i === currentPage ? " active" : "");
-      const a = document.createElement("a");
-      a.className = "page-link";
-      a.href = "#";
-      a.textContent = i;
-      a.addEventListener("click", function (e) {
-        e.preventDefault();
-        currentPage = i;
+            for (let i = 1; i <= totalPages; i++) {
+            const li = document.createElement("li");
+            li.className = "page-item" + (i === currentPage ? " active" : "");
+            const a = document.createElement("a");
+            a.className = "page-link";
+            a.href = "#";
+            a.textContent = i;
+            a.addEventListener("click", function (e) {
+                e.preventDefault();
+                currentPage = i;
+                showPage(currentPage);
+                document.querySelectorAll(".pagination .page-item").forEach(li => li.classList.remove("active"));
+                li.classList.add("active");
+            });
+            li.appendChild(a);
+            ul.appendChild(li);
+            }
+
+            paginationContainer.appendChild(ul);
+            table.parentElement.appendChild(paginationContainer);
+        }
         showPage(currentPage);
-        document.querySelectorAll(".pagination .page-item").forEach(li => li.classList.remove("active"));
-        li.classList.add("active");
-      });
-      li.appendChild(a);
-      ul.appendChild(li);
-    }
-
-    paginationContainer.appendChild(ul);
-    table.parentElement.appendChild(paginationContainer);
-  }
-  showPage(currentPage);
-  renderPagination();
-});
-</script>
+        renderPagination();
+        });
+    </script>
 
     
 <th:block th:replace="~{/general/footer.html}"></th:block>
