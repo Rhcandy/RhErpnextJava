@@ -42,18 +42,18 @@ public class DataDbController {
 
     @PostMapping("/import")
     public String ImportDataTdata(
-            @RequestParam("items_file") MultipartFile itemsFile,
-            @RequestParam("suppliers_file") MultipartFile suppliersFile,
-            @RequestParam("quotations_file") MultipartFile quotationsFile,
+            @RequestParam("files1") MultipartFile files1,
+            @RequestParam("file2") MultipartFile file2,
+            @RequestParam("file3") MultipartFile file3,
             HttpSession session,
             RedirectAttributes redirectAttributes
     ) {
         try {
-            String itemsContent = new String(itemsFile.getBytes(), StandardCharsets.UTF_8);
-            String suppliersContent = new String(suppliersFile.getBytes(), StandardCharsets.UTF_8);
-            String quotationsContent = new String(quotationsFile.getBytes(), StandardCharsets.UTF_8);
+            String fichier1 = new String(files1.getBytes(), StandardCharsets.UTF_8);
+            String fichier2 = new String(file2.getBytes(), StandardCharsets.UTF_8);
+            String fichier3 = new String(file3.getBytes(), StandardCharsets.UTF_8);
 
-            String message = DataService.sendCsvDataToFrappe(session, itemsContent, suppliersContent, quotationsContent);
+            String message = DataService.sendCsvDataToFrappe(session, fichier1, fichier2, fichier3);
             redirectAttributes.addFlashAttribute("message", message);
         } catch (IOException e) {
             redirectAttributes.addFlashAttribute("message", e.getMessage());

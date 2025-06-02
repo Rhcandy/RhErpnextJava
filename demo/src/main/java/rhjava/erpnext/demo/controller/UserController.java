@@ -28,7 +28,6 @@ public class UserController {
 
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         String body = "usr=" + username + "&pwd=" + password;
-        System.out.println(body);
         HttpEntity<String> request = new HttpEntity<>(body, headers);
         try {
             ResponseEntity<String> response = rest.exchange(

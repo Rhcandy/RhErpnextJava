@@ -47,16 +47,16 @@ public class DataService {
             return "❌ Exception lors de l’appel : " + e.getMessage();
         }
     }
-    public String sendCsvDataToFrappe(HttpSession session, String items, String suppliers, String quotations) {
+    public String sendCsvDataToFrappe(HttpSession session, String fichier1, String fichier2, String fichier3) {
         String url = erpNextConfig.getApiUrl() + "/method/my_app.csv.fonction.import_data_from_files";
 
         HttpHeaders headers = erpNextConfig.createHeaders(session);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("item_file_content", items);
-        requestBody.put("supplier_file_content", suppliers);
-        requestBody.put("quotation_file_content", quotations);
+        requestBody.put("fichier1", fichier1);
+        requestBody.put("fichier2", fichier2);
+        requestBody.put("fichier3", fichier3);
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
         try {
             ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, request, Map.class);
