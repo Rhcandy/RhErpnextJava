@@ -90,6 +90,7 @@
 <script th:inline="javascript">
     async function exportPDF2() {
         const salarySlipName = /*[[${salarySlip.employee_name}]]*/ 'Employe';
+        const month= /*[[${salarySlip.getMois()}]]*/'Janvier';
 
         const element = document.getElementById('salary-slip-container');
         const exportBtn = document.getElementById('export_pdf_btn');
@@ -99,7 +100,7 @@
 
         const opt = {
             margin:       0.5,
-            filename:     `Fiche_Paie_${salarySlipName}.pdf`,
+            filename:     `Fiche_Paie_${month}_${salarySlipName}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true },
             jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
@@ -115,114 +116,197 @@
         }
     }
 
-
-    async function exportPDF() {
+   async function exportPDF() {
         const { jsPDF } = window.jspdf;
 
         const salarySlip = {
             name: /*[[${salarySlip.name}]]*/ '',
             status: /*[[${salarySlip.status}]]*/ '',
             payroll_frequency: /*[[${salarySlip.payroll_frequency}]]*/ '',
-            net_pay: /*[[${salarySlip.net_pay}]]*/ 0,
+            net_pay: /*[[${#numbers.formatDecimal(salarySlip.net_pay, 0, 'COMMA', 2, 'POINT')}]]*/ 0,
             start_date: /*[[${salarySlip.start_date}]]*/ '',
             end_date: /*[[${salarySlip.end_date}]]*/ '',
             salary_structure: /*[[${salarySlip.salary_structure}]]*/ '',
             mode_of_payment: /*[[${salarySlip.mode_of_payment}]]*/ '',
             total_working_days: /*[[${salarySlip.total_working_days}]]*/ 0,
-            gross_pay: /*[[${salarySlip.gross_pay}]]*/ 0,
-            total_deduction: /*[[${salarySlip.total_deduction}]]*/ 0,
+            gross_pay: /*[[${#numbers.formatDecimal(salarySlip.gross_pay, 0, 'COMMA', 2, 'POINT')}]]*/ 0,
+            total_deduction: /*[[${#numbers.formatDecimal(salarySlip.total_deduction, 0, 'COMMA', 2, 'POINT')}]]*/ 0,
             employee_name: /*[[${salarySlip.employee_name}]]*/ '',
             currency: /*[[${salarySlip.currency}]]*/ '',
-            mois: /*[[${salarySlip.getMois()}]]*/ ''  // <-- ajout ici
+            mois: /*[[${salarySlip.getMois()}]]*/ '',
+            earnings: /*[[${salarySlip.earnings}]]*/ [],
+            deductions: /*[[${salarySlip.deductions}]]*/ []
         };
 
         const doc = new jsPDF();
         let y = 20;
 
-        // En-tête
-        doc.setFontSize(20);
-        doc.setTextColor(33, 37, 41);
+        // Couleur bleue pour titres
+        const blueColor = [10, 55, 140];
+
+        // === En-tête ===
+        doc.setFontSize(22).setTextColor(...blueColor).setFont('helvetica', 'bold');
         doc.text("Fiche de Paie", 105, y, { align: "center" });
-        y += 10;
 
-        // Affichage du mois sous le titre
-        doc.setFontSize(14);
-        doc.setTextColor(70, 70, 70);
-        doc.text(`Mois : ${salarySlip.mois}`, 105, y, { align: "center" });
-        y += 10;
+        y += 12;
+        doc.setFontSize(14).setTextColor(80).setFont('helvetica', 'bold');
+        doc.text(`Mois : ${salarySlip.mois}`, 20, y);
+        
+        y+=8;
+        doc.text(`Statut : ${salarySlip.status}`, 40, y, { align: 'center' });
+        doc.text(`Réf : ${salarySlip.name}`, 190, y, { align: 'right' });
 
-        doc.setDrawColor(200);
-        doc.line(20, y, 190, y);
-        y += 10;
+        y += 8;
+        doc.setDrawColor(0, 0, 150);
+        doc.setLineWidth(0.7);
+        doc.line(15, y, 195, y);
+        y += 14;
 
-        // Infos Employé
-        doc.setFontSize(14);
-        doc.setTextColor(52, 58, 64);
-        doc.text("Informations de l'employé", 20, y);
-        y += 5;
-        doc.setDrawColor(220);
-        doc.setFillColor(245, 245, 245);
-        doc.roundedRect(15, y, 180, 40, 2, 2, 'F');
-        y += 10;
-        doc.setFontSize(11);
-        doc.setTextColor(0);
-        doc.text(`Nom : ${salarySlip.employee_name}`, 20, y);
-        doc.text(`Devise : ${salarySlip.currency}`, 120, y);
+        // === Infos Employé ===
+        doc.setFontSize(16).setTextColor(...blueColor).setFont('helvetica', 'bold');
+        doc.text("Informations de l'employé", 15, y);
         y += 8;
-        doc.text(`Structure : ${salarySlip.salary_structure}`, 20, y);
-        doc.text(`Mode de paiement : ${salarySlip.mode_of_payment}`, 120, y);
+
+        doc.setFontSize(12).setTextColor(0).setFont('helvetica', 'normal');
+
+        // Labels en gras, valeurs normales alignées à droite dans la même colonne
+        const leftColX = 15;
+        const rightColX = 105;
+        const labelWidth = 40;
+
+        // Ligne 1
+        doc.setFont('helvetica', 'bold');
+        doc.text("Nom :", leftColX, y);
+        doc.text("Devise :", rightColX, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`${salarySlip.employee_name}`, leftColX + labelWidth, y);
+        doc.text(`${salarySlip.currency}`, rightColX + labelWidth, y);
         y += 8;
-        doc.text(`Période : ${salarySlip.start_date} -> ${salarySlip.end_date}`, 20, y);
-        doc.text(`Fréquence : ${salarySlip.payroll_frequency}`, 120, y);
+
+        // Ligne 2
+        doc.setFont('helvetica', 'bold');
+        doc.text("Structure :", leftColX, y);
+        doc.text("Paiement :", rightColX, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`${salarySlip.salary_structure}`, leftColX + labelWidth, y);
+        doc.text(`${salarySlip.mode_of_payment}`, rightColX + labelWidth, y);
         y += 8;
-        doc.text(`Jours travaillés : ${salarySlip.total_working_days}`, 20, y);
+
+        // Ligne 3
+        doc.setFont('helvetica', 'bold');
+        doc.text("Période :", leftColX, y);
+        doc.text("Fréquence :", rightColX, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`${salarySlip.start_date} à ${salarySlip.end_date}`, leftColX + labelWidth, y);
+        doc.text(`${salarySlip.payroll_frequency}`, rightColX + labelWidth, y);
+        y += 8;
+
+        // Ligne 4
+        doc.setFont('helvetica', 'bold');
+        doc.text("Jours travaillés :", leftColX, y);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`${salarySlip.total_working_days}`, leftColX + labelWidth, y);
+
+        y += 14;
+        doc.setDrawColor(0, 0, 150);
+        doc.setLineWidth(0.7);
+        doc.line(15, y, 195, y);
         y += 12;
 
-        // Détails de Paie
-        doc.setFontSize(14);
-        doc.setTextColor(52, 58, 64);
-        doc.text("Détails de paie", 20, y);
-        y += 5;
-        doc.setDrawColor(220);
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(15, y, 180, 30, 2, 2, 'F');
+        // === Composants (earnings / deductions) en ligne ===
+        doc.setFontSize(16).setTextColor(...blueColor).setFont('helvetica', 'bold');
+        doc.text("Détails des Composants", 15, y);
         y += 10;
-        doc.setFontSize(11);
-        doc.setTextColor(33, 37, 41);
-        doc.text(`Salaire brut :`, 20, y);
-        doc.text(`${salarySlip.gross_pay} ${salarySlip.currency}`, 60, y);
-        y += 8;
-        doc.text(`Déductions :`, 20, y);
-        doc.text(`${salarySlip.total_deduction} ${salarySlip.currency}`, 60, y);
-        y += 8;
-        doc.setTextColor(0, 100, 0);
-        doc.setFont('helvetica', 'bold');
-        doc.text(`Net à payer :`, 20, y);
-        doc.text(`${salarySlip.net_pay} ${salarySlip.currency}`, 60, y);
+
+        // En-tête tableau gains/retenues
+        doc.setFontSize(12).setTextColor(255).setFillColor(...blueColor).setFont('helvetica', 'bold');
+        const tableX = 15;
+        const tableWidth = 180;
+        const tableHeight = 10;
+        doc.rect(tableX, y, tableWidth, tableHeight, 'F');
+
+        // Colonnes : Gains (70), Montant (30), Retenues (70), Montant (30)
+        doc.text("Gains", tableX + 5, y + 7);
+        doc.text("Montant", tableX + 70, y + 7, { align: "right" });
+        doc.text("Retenues", tableX + 105, y + 7);
+        doc.text("Montant", tableX + 180, y + 7, { align: "right" });
+
+        y += tableHeight + 5;
+
+        doc.setFontSize(11).setTextColor(0).setFont('helvetica', 'normal');
+
+        const maxLines = Math.max(salarySlip.earnings.length, salarySlip.deductions.length);
+        const lineHeight =8;
+
+        for (let i = 0; i < maxLines; i++) {
+            const earning = salarySlip.earnings[i];
+            const deduction = salarySlip.deductions[i];
+
+            // Gains colonne gauche
+            if (earning) {
+                doc.text(`${earning.salary_component}`, tableX + 5, y);
+                doc.text(`${earning.default_amount} ${salarySlip.currency}`, tableX + 70, y, { align: "right" });
+            }
+
+            // Retenues colonne droite
+            if (deduction) {
+                doc.text(`${deduction.salary_component}`, tableX + 105, y);
+                doc.text(`${deduction.default_amount} ${salarySlip.currency}`, tableX + 180, y, { align: "right" });
+            }
+
+            y += lineHeight;
+
+            // Nouvelle page si nécessaire
+            if (y > 270) {
+                doc.addPage();
+                y = 20;
+            }
+        }
+
+        y += 12;
+
+        // === Détail Financier ===
+        doc.setFontSize(16).setTextColor(...blueColor).setFont('helvetica', 'bold');
+        doc.text("Résumé Financier", 15, y);
+        y += 10;
+
+        // Labels en gras, valeurs normales alignées
+        doc.setFontSize(12).setTextColor(0).setFont('helvetica', 'bold');
+        doc.text("Salaire Brut :", 20, y);
+        doc.text("Total Déductions :", 90, y);
+        doc.text("Net à Payer :", 160, y);
+
+        y += 7;
         doc.setFont('helvetica', 'normal');
-        y += 15;
+        doc.text(`${salarySlip.gross_pay} ${salarySlip.currency}`, 20, y);
+        doc.text(`${salarySlip.total_deduction} ${salarySlip.currency}`, 90, y);
+        doc.setTextColor(0, 100, 0).setFont('helvetica', 'bold');
+        doc.text(`${salarySlip.net_pay} ${salarySlip.currency}`, 160, y);
+        doc.setTextColor(0).setFont('helvetica', 'normal');
 
-        // Références
-        doc.setFontSize(14);
-        doc.setTextColor(52, 58, 64);
-        doc.text("Informations complémentaires", 20, y);
-        y += 5;
-        doc.setDrawColor(220);
-        doc.setFillColor(248, 249, 250);
-        doc.roundedRect(15, y, 180, 15, 2, 2, 'F');
-        y += 10;
-        doc.setFontSize(11);
-        doc.setTextColor(0);
-        doc.text(`Statut : ${salarySlip.status}`, 20, y);
-        doc.text(`Référence : ${salarySlip.name}`, 120, y);
+        y += 20;
+        doc.setDrawColor(0, 0, 150);
+        doc.setLineWidth(0.7);
+        doc.line(15, y, 195, y);
 
-        // Pied de page
-        doc.setFontSize(10);
-        doc.setTextColor(150);
+        // === Pied de page ===
+        doc.setFontSize(10).setTextColor(150);
         doc.text("Document généré automatiquement - confidentiel", 105, 285, { align: "center" });
 
-        doc.save(`Fiche_Paie_${salarySlip.employee_name}.pdf`);
+        // Export PDF
+        doc.save(`Fiche_Paie_${salarySlip.mois}_${salarySlip.employee_name}.pdf`);
     }
+
+
+    function formatAmount(value, currency) {
+        return new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: currency || 'EUR',
+            minimumFractionDigits: 2
+        }).format(value);
+    }
+
+
 
 
 </script>
