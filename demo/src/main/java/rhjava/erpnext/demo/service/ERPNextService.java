@@ -39,7 +39,13 @@ public class ERPNextService {
     public <T> List<T> getList(HttpSession session, String resource, Class<T> type) {
         try {
             String encodedResource = URLEncoder.encode(resource, StandardCharsets.UTF_8.name());
-            String url = erpNextConfig.getApiUrl() + "/resource/" + encodedResource;
+            URI url = UriComponentsBuilder.fromHttpUrl(erpNextConfig.getApiUrl())
+                .pathSegment("resource", encodedResource)
+                .queryParam("limit_page_length", 200)  // limite à 200 résultats
+                .build()
+                .encode(StandardCharsets.UTF_8)
+                .toUri();
+
             HttpEntity<String> request = new HttpEntity<>(erpNextConfig.createHeaders(session));
 
             ResponseEntity<ERPListResponse<LinkedHashMap>> response = restTemplate.exchange(
@@ -67,6 +73,7 @@ public class ERPNextService {
             URI url = UriComponentsBuilder.fromHttpUrl(erpNextConfig.getApiUrl())
                 .pathSegment("resource", resource)
                 .queryParam("filters", filtersJson)
+                .queryParam("limit_page_length", 200)
                 .build()
                 .encode(StandardCharsets.UTF_8)
                 .toUri();
@@ -106,6 +113,7 @@ public class ERPNextService {
                 .pathSegment("resource", resource)
                 .queryParam("filters", filtersJson)
                 .queryParam("fields", fieldsJson)
+                .queryParam("limit_page_length", 200)
                 .build()
                 .encode(StandardCharsets.UTF_8)
                 .toUri();
@@ -139,6 +147,7 @@ public class ERPNextService {
             URI url = UriComponentsBuilder.fromHttpUrl(erpNextConfig.getApiUrl())
                 .pathSegment("resource", resource)
                 .queryParam("fields", fieldsJson)
+                .queryParam("limit_page_length", 200)
                 .build()
                 .encode(StandardCharsets.UTF_8)
                 .toUri();

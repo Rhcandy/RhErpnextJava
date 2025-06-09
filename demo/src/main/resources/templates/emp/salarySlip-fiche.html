@@ -12,7 +12,7 @@
         <div class="card border-0 shadow-sm" id="salary-slip-container">
             <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
                 <div>
-                    <h5 class="mb-1">Fiche de Paie</h5>
+                    <h5 class="mb-1">Salary Slip</h5>
                     <small class="text-muted" th:text="'Mois : ' + ${salarySlip.getMois()}"></small><br/>
                     <small class="text-muted" th:text="'#' + ${salarySlip.name} + ' - ' + ${salarySlip.status}"></small>
                 </div>
@@ -29,10 +29,10 @@
                     <div class="col-md-6">
                         <div class="card border bg-light-subtle h-100">
                             <div class="card-body">
-                                <h3 class="text-muted">Informations Employé</h3>
-                                <p><strong>Nom :</strong> <span th:text="${salarySlip.employee_name}"></span></p>
+                                <h3 class="text-muted">Informations </h3>
+                                <p><strong>Name :</strong> <span th:text="${salarySlip.employee_name}"></span></p>
                                 <p><strong>Devise :</strong> <span th:text="${salarySlip.currency}"></span></p>
-                                <p><strong>Mode de Paiement :</strong> <span th:text="${salarySlip.mode_of_payment}"></span></p>
+                                <p><strong>Paiement Mode :</strong> <span th:text="${salarySlip.mode_of_payment}"></span></p>
                             </div>
                         </div>
                     </div>
@@ -41,42 +41,75 @@
                     <div class="col-md-6">
                         <div class="card border bg-light-subtle h-100">
                             <div class="card-body">
-                                <h3 class="text-muted">Période de Paie</h3>
-                                <p><strong>Début :</strong> <span th:text="${salarySlip.start_date}"></span></p>
-                                <p><strong>Fin :</strong> <span th:text="${salarySlip.end_date}"></span></p>
-                                <p><strong>Fréquence :</strong> <span th:text="${salarySlip.payroll_frequency}"></span></p>
+                                <h3 class="text-muted">Periode de Paie</h3>
+                                <p><strong>Start :</strong> <span th:text="${salarySlip.start_date}"></span></p>
+                                <p><strong>End :</strong> <span th:text="${salarySlip.end_date}"></span></p>
+                                <p><strong>Frequence :</strong> <span th:text="${salarySlip.payroll_frequency}"></span></p>
                                 <p><strong>Structure :</strong> <span th:text="${salarySlip.salary_structure}"></span></p>
                             </div>
                         </div>
                     </div>
 
+                    <div class="col-md-6">
+                        <div class="card border bg-light-subtle h-100">
+                            <div class="card-body">
+                                <h3 class="text-muted">Earnings</h3>
+                                <table class="table table-sm " >
+                                    <tbody>
+                                        <tr th:each="earn : ${salarySlip.earnings}">
+                                            <td th:text="${earn.salary_component}">Salaire de Base</td>
+                                            <td th:text="${#numbers.formatDecimal(earn.default_amount, 0, 'COMMA', 2, 'POINT')} + ' ' + ${salarySlip.currency}">0 MGA</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card border bg-light-subtle h-100">
+                            <div class="card-body">
+                                <h3 class="text-muted">Deductions</h3>
+                                 <table class="table table-sm " >
+                                    <tbody>
+                                        <tr th:each="earn : ${salarySlip.deductions}">
+                                            <td th:text="${earn.salary_component}">Salaire de Base</td>
+                                            <td th:text="${#numbers.formatDecimal(earn.default_amount, 0, 'COMMA', 2, 'POINT')} + ' ' + ${salarySlip.currency}">0 MGA</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
                     <!-- Résumé Paie -->
                     <div class="col-md-4">
                         <div class="card border h-100 text-center">
                             <div class="card-body">
-                                <h6 class="text-muted">Net à Payer</h6>
+                                <h6 class="text-muted">Gross Pay </h6>
+                                <h4 class="fw-bold" th:text="${#numbers.formatDecimal(salarySlip.gross_pay, 0, 'COMMA', 2, 'POINT')} + ' ' + ${salarySlip.currency}"></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border h-100 text-center">
+                            <div class="card-body bg-warning">
+                                <h6 class="text-muted">Total Deduction :</h6>
+                                <h4 class="fw-bold" th:text="${#numbers.formatDecimal(salarySlip.total_deduction, 0, 'COMMA', 2, 'POINT')} + ' ' + ${salarySlip.currency}"></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border h-100 text-center">
+                            <div class="card-body bg-success">
+                                <h6 class="text-muted">Net Paye</h6>
                                 <h4 class="fw-bold" th:text="${#numbers.formatDecimal(salarySlip.net_pay, 0, 'COMMA', 2, 'POINT')} + ' ' + ${salarySlip.currency}"></h4>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <div class="card border h-100 text-center">
-                            <div class="card-body">
-                                <h6 class="text-muted">Salaire Brut</h6>
-                                <h4 class="fw-bold" th:text="${#numbers.formatDecimal(salarySlip.gross_pay, 0, 'COMMA', 2, 'POINT')} + ' ' + ${salarySlip.currency}"></h4>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="col-md-4">
-                        <div class="card border h-100 text-center">
-                            <div class="card-body">
-                                <h6 class="text-muted">Déductions</h6>
-                                <h4 class="fw-bold" th:text="${#numbers.formatDecimal(salarySlip.total_deduction, 0, 'COMMA', 2, 'POINT')} + ' ' + ${salarySlip.currency}"></h4>
-                            </div>
-                        </div>
-                    </div>
 
                 </div>
             </div>
@@ -146,15 +179,15 @@
 
         // === En-tête ===
         doc.setFontSize(22).setTextColor(...blueColor).setFont('helvetica', 'bold');
-        doc.text("Fiche de Paie", 105, y, { align: "center" });
+        doc.text("Salary Slip", 105, y, { align: "center" });
 
         y += 12;
         doc.setFontSize(14).setTextColor(80).setFont('helvetica', 'bold');
-        doc.text(`Mois : ${salarySlip.mois}`, 20, y);
+        doc.text(`Month : ${salarySlip.mois}`, 20, y);
         
         y+=8;
         doc.text(`Statut : ${salarySlip.status}`, 40, y, { align: 'center' });
-        doc.text(`Réf : ${salarySlip.name}`, 190, y, { align: 'right' });
+        doc.text(`Ref : ${salarySlip.name}`, 190, y, { align: 'right' });
 
         y += 8;
         doc.setDrawColor(0, 0, 150);
@@ -164,7 +197,7 @@
 
         // === Infos Employé ===
         doc.setFontSize(16).setTextColor(...blueColor).setFont('helvetica', 'bold');
-        doc.text("Informations de l'employé", 15, y);
+        doc.text("Employee Informations", 15, y);
         y += 8;
 
         doc.setFontSize(12).setTextColor(0).setFont('helvetica', 'normal');
@@ -176,7 +209,7 @@
 
         // Ligne 1
         doc.setFont('helvetica', 'bold');
-        doc.text("Nom :", leftColX, y);
+        doc.text("Name :", leftColX, y);
         doc.text("Devise :", rightColX, y);
         doc.setFont('helvetica', 'normal');
         doc.text(`${salarySlip.employee_name}`, leftColX + labelWidth, y);
@@ -194,8 +227,8 @@
 
         // Ligne 3
         doc.setFont('helvetica', 'bold');
-        doc.text("Période :", leftColX, y);
-        doc.text("Fréquence :", rightColX, y);
+        doc.text("Periode :", leftColX, y);
+        doc.text("Frequence :", rightColX, y);
         doc.setFont('helvetica', 'normal');
         doc.text(`${salarySlip.start_date} à ${salarySlip.end_date}`, leftColX + labelWidth, y);
         doc.text(`${salarySlip.payroll_frequency}`, rightColX + labelWidth, y);
@@ -203,7 +236,7 @@
 
         // Ligne 4
         doc.setFont('helvetica', 'bold');
-        doc.text("Jours travaillés :", leftColX, y);
+        doc.text("Days Worked:", leftColX, y);
         doc.setFont('helvetica', 'normal');
         doc.text(`${salarySlip.total_working_days}`, leftColX + labelWidth, y);
 
@@ -215,21 +248,21 @@
 
         // === Composants (earnings / deductions) en ligne ===
         doc.setFontSize(16).setTextColor(...blueColor).setFont('helvetica', 'bold');
-        doc.text("Détails des Composants", 15, y);
+        doc.text("Salary Structure", 15, y);
         y += 10;
 
         // En-tête tableau gains/retenues
         doc.setFontSize(12).setTextColor(255).setFillColor(...blueColor).setFont('helvetica', 'bold');
         const tableX = 15;
-        const tableWidth = 180;
+        const tableWidth = 190;
         const tableHeight = 10;
         doc.rect(tableX, y, tableWidth, tableHeight, 'F');
 
         // Colonnes : Gains (70), Montant (30), Retenues (70), Montant (30)
-        doc.text("Gains", tableX + 5, y + 7);
-        doc.text("Montant", tableX + 70, y + 7, { align: "right" });
-        doc.text("Retenues", tableX + 105, y + 7);
-        doc.text("Montant", tableX + 180, y + 7, { align: "right" });
+        doc.text("Earnings", tableX + 5, y + 7);
+        doc.text("Amount", tableX + 90, y + 7, { align: "right" });
+        doc.text("Deductions", tableX + 105, y + 7);
+        doc.text("Amount", tableX + 180, y + 7, { align: "right" });
 
         y += tableHeight + 5;
 
@@ -245,13 +278,13 @@
             // Gains colonne gauche
             if (earning) {
                 doc.text(`${earning.salary_component}`, tableX + 5, y);
-                doc.text(`${earning.default_amount} ${salarySlip.currency}`, tableX + 70, y, { align: "right" });
+                doc.text(formatAmount(earning.default_amount, 'en-US', salarySlip.currency), tableX + 90, y, { align: "right" });
             }
 
             // Retenues colonne droite
             if (deduction) {
                 doc.text(`${deduction.salary_component}`, tableX + 105, y);
-                doc.text(`${deduction.default_amount} ${salarySlip.currency}`, tableX + 180, y, { align: "right" });
+                doc.text(formatAmount(deduction.default_amount, 'en-US', salarySlip.currency), tableX + 180, y, { align: "right" });
             }
 
             y += lineHeight;
@@ -267,14 +300,14 @@
 
         // === Détail Financier ===
         doc.setFontSize(16).setTextColor(...blueColor).setFont('helvetica', 'bold');
-        doc.text("Résumé Financier", 15, y);
+        doc.text("Financial Summary", 15, y);
         y += 10;
 
         // Labels en gras, valeurs normales alignées
         doc.setFontSize(12).setTextColor(0).setFont('helvetica', 'bold');
-        doc.text("Salaire Brut :", 20, y);
-        doc.text("Total Déductions :", 90, y);
-        doc.text("Net à Payer :", 160, y);
+        doc.text("Gross Pay:", 20, y);
+        doc.text("Total Deductions :", 90, y);
+        doc.text("Net Pay :", 160, y);
 
         y += 7;
         doc.setFont('helvetica', 'normal');
@@ -288,23 +321,21 @@
         doc.setDrawColor(0, 0, 150);
         doc.setLineWidth(0.7);
         doc.line(15, y, 195, y);
-
-        // === Pied de page ===
-        doc.setFontSize(10).setTextColor(150);
-        doc.text("Document généré automatiquement - confidentiel", 105, 285, { align: "center" });
-
         // Export PDF
         doc.save(`Fiche_Paie_${salarySlip.mois}_${salarySlip.employee_name}.pdf`);
     }
 
 
-    function formatAmount(value, currency) {
-        return new Intl.NumberFormat('fr-FR', {
-            style: 'currency',
-            currency: currency || 'EUR',
-            minimumFractionDigits: 2
-        }).format(value);
+    function formatAmount(amount, locale = 'en-US',currency) {
+        const numberFormatted = new Intl.NumberFormat(locale, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            useGrouping: true
+        }).format(amount);
+
+        return `${numberFormatted} ${currency}`;
     }
+
 
 
 

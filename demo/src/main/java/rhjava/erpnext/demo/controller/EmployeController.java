@@ -32,23 +32,19 @@ public class EmployeController {
     public String filterEmployees(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String employeeName,
-            @RequestParam(required = false) String department,
-            @RequestParam(required = false) String designation,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             Model model,
             HttpSession session
             ) {
-
         List<String> fields = Arrays.asList("name", "employee_name", "date_of_joining", "status","designation","department","designation","gender","date_of_birth","company","branch");
         List<Employee> allEmployees=erpNextService.getListWithFields(session, "Employee", fields, Employee.class);
+        System.out.println(allEmployees.size());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // adapte au format réel
 
         List<Employee> filtered = allEmployees.stream()
             .filter(e -> name == null || e.getName() != null && e.getName().toLowerCase().contains(name.toLowerCase()))
             .filter(e -> employeeName == null || e.getEmployee_name() != null && e.getEmployee_name().toLowerCase().contains(employeeName.toLowerCase()))
-            .filter(e -> department == null || e.getDepartment() != null && e.getDepartment().toLowerCase().contains(department.toLowerCase()))
-            .filter(e -> designation == null || e.getDesignation() != null && e.getDesignation().toLowerCase().contains(designation.toLowerCase()))
             .filter(e -> {
                 if (startDate == null) return true;
                 try {
@@ -68,10 +64,7 @@ public class EmployeController {
                 }
             })
             .collect(Collectors.toList());
-        List<Base> departements= erpNextService.getList(session, "Department", Base.class) ;
-        List<Base> designations= erpNextService.getList(session, "Designation", Base.class);
-        model.addAttribute("departement", departements);
-        model.addAttribute("designation", designations);
+       
         model.addAttribute("activePage", "employee");
         model.addAttribute("pageTitle", "Employee");
         model.addAttribute("list", filtered);
@@ -83,10 +76,6 @@ public class EmployeController {
     public String ListEmployer(HttpSession session,Model model) {
         List<String> fields = Arrays.asList("name", "employee_name", "date_of_joining", "status","designation","department","designation","gender","date_of_birth","company","branch");
         List<Employee> employees=erpNextService.getListWithFields(session, "Employee", fields, Employee.class);
-        List<Base> departements= erpNextService.getList(session, "Department", Base.class) ;
-        List<Base> designations= erpNextService.getList(session, "Designation", Base.class);
-        model.addAttribute("departement", departements);
-        model.addAttribute("designation", designations);
         model.addAttribute("activePage", "employee");
         model.addAttribute("pageTitle", "Employee");
         model.addAttribute("list", employees);

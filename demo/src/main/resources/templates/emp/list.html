@@ -41,27 +41,6 @@
                                     placeholder="Nom et prénom">
                             </div>
                             
-                            <!-- Département -->
-                            <div class="col-12 col-md-6 col-lg-3">
-                                <label for="department" class="form-label fw-bold small text-muted">Departement</label>
-                                <select name="department" id="department" class="form-select form-select-sm">
-                                    <option value="">Tous les départements</option>
-                                    <th:block th:each="dept : ${departement}">
-                                        <option th:value="${dept.name}" th:text="${dept.name}"></option>
-                                    </th:block>
-                                </select>
-                            </div>
-
-                            <!-- Désignation -->
-                            <div class="col-12 col-md-6 col-lg-3">
-                                <label for="designation" class="form-label fw-bold small text-muted">Designation</label>
-                                <select name="designation" id="designation" class="form-select form-select-sm">
-                                    <option value="">Tous les postes</option>
-                                    <th:block th:each="desig : ${designation}">
-                                        <option th:value="${desig.name}" th:text="${desig.name}"></option>
-                                    </th:block>
-                                </select>
-                            </div>
 
                             <!-- Date de début -->
                             <div class="col-12 col-md-6 col-lg-4">
@@ -105,7 +84,6 @@
                     <thead>
                         <tr>
                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Employee</th>
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Function</th>
                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Employed</th>
                         <th class="text-secondary opacity-7"></th>
@@ -120,10 +98,6 @@
                                         <p class="text-xs text-secondary mb-0" th:text="${emp.name}">emp_code</p>
                                     </div>
                                 </div>
-                            </td>
-                            <td>
-                                <p class="text-xs font-weight-bold mb-0" th:text="${emp.designation}">Designation</p>
-                                <p class="text-xs text-secondary mb-0" th:text="${emp.department}">Department</p> 
                             </td>
                             <td class="align-middle text-center text-sm">
                                 <span class="text-secondary text-xs font-weight-bold" th:text="${emp.status}">Status</span>

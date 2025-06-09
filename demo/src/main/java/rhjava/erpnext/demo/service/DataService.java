@@ -4,10 +4,14 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -16,8 +20,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.servlet.http.HttpSession;
 import rhjava.erpnext.demo.config.ERPNextConfig;
+import rhjava.erpnext.demo.model.TotalAnnee;
+import rhjava.erpnext.demo.service.ERPNextService.ERPListResponse;
 
 @Service
 public class DataService {
@@ -70,7 +78,6 @@ public class DataService {
             } else {
                 return "❌ Erreur Frappe : code HTTP " + response.getStatusCode();
             }
-
         } catch (Exception e) {
             return "❌ Exception lors de l’appel Frappe : " + e.getMessage();
         }
@@ -111,6 +118,38 @@ public class DataService {
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Mois invalide : " + monthInput);
         }
+    }
+
+    public List<TotalAnnee> get_salary_statistics_month_by_year(HttpSession session, String year) {
+        List<TotalAnnee> result = new ArrayList<>();
+        // Met le paramètre year dans l'URL en GET
+        String url = erpNextConfig.getApiUrl() + "/method/my_app.csv.fonction.get_salary_statistics_month_by_year?year=" + year;
+
+        HttpHeaders headers = erpNextConfig.createHeaders(session);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        try {
+           ResponseEntity<LinkedHashMap> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<LinkedHashMap>() {}
+            );
+
+            ObjectMapper mapper = new ObjectMapper();
+            Object rawList = response.getBody().get("message");
+            List<LinkedHashMap> maps = (List<LinkedHashMap>) rawList;
+            for (LinkedHashMap map : maps) {
+                result.add(mapper.convertValue(map, TotalAnnee.class));
+            }
+            System.out.println(result.size());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
 
