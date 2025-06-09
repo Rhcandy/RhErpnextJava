@@ -131,8 +131,8 @@
                                 <div class="card-body">
                                     <h6 class="text-muted text-uppercase small">Salary Structure</h6>
                                     <div class="row">
-                                        <div class="col-6 bg-success">
-                                            <h6 class="text-center">Earnings</h6>
+                                        <div class="col-6">
+                                            <h6 class="text-center text-success">Earnings</h6>
                                             <table class="table table-sm " >
                                                 <tbody>
                                                     <tr th:each="earn : ${emp.earnings}">
@@ -142,8 +142,8 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div class="col-6 bg-warning">
-                                            <h6 class="text-center">Deductions</h6>
+                                        <div class="col-6">
+                                            <h6 class="text-center text-danger">Deductions</h6>
                                             <table class="table table-sm " >
                                                 <tbody>
                                                     <tr th:each="deduct : ${emp.deductions}">
