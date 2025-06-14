@@ -71,6 +71,53 @@
                 </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-12">
+                <div class="card mb-4 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <form method="get" action="/data/Generate" class="row g-3 align-items-end">
+                            <div class="col-12 col-md-6 col-lg-3">
+                                <label for="employeeName" class="form-label fw-bold small text-muted">Name</label>
+                                 <select id="Employername" name="Employername" class="form-control" required>
+                                    <option value="">Sélectionner un Employer</option>
+                                    <option th:each="emp : ${list}" th:value="${emp.name}" th:text="${emp.name}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Date de début -->
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <label for="startDate" class="form-label fw-bold small text-muted">Start Date</label>
+                                 <input type="month" name="monthdebut" id="monthdebut" class="form-control form-control-sm" placeholder="Month" required>
+                            </div>
+                            
+                            <!-- Date de fin -->
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <label for="endDate" class="form-label fw-bold small text-muted">End Date</label>
+                                 <input type="month" name="monthfin" id="monthfin" class="form-control form-control-sm" placeholder="Month" required>
+                            </div>
+                             
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <label for="base" class="form-label fw-bold small text-muted">Salary base</label>
+                                 <input type="number" name="base" id="base" class="form-control form-control-sm" placeholder="Base" value="0.0" >
+                            </div>
+
+                            <div class="col-12 col-lg-4 d-flex ">
+                                <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                                    <i class="bi bi-search me-1"></i>Generate
+                                </button>
+                            </div>
+                            
+                        </form>
+                        <div th:if="${message}" class="alert alert-success alert-dismissible fade show col-md-6 float-end" role="alert">
+                            <span class="alert-text" th:text="${message}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
 
 
             <div class="col-12">

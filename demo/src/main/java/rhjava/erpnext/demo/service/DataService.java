@@ -4,12 +4,16 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -24,14 +28,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpSession;
 import rhjava.erpnext.demo.config.ERPNextConfig;
+import rhjava.erpnext.demo.model.SalarySlip;
 import rhjava.erpnext.demo.model.TotalAnnee;
-import rhjava.erpnext.demo.service.ERPNextService.ERPListResponse;
+
 
 @Service
 public class DataService {
 
     private final ERPNextConfig erpNextConfig;
     private final RestTemplate restTemplate;
+     @Autowired
+    private ERPNextService erpNextService;
 
     public DataService(ERPNextConfig erpNextConfig, RestTemplateBuilder restTemplateBuilder) {
         this.erpNextConfig = erpNextConfig;
@@ -150,6 +157,64 @@ public class DataService {
         }
 
         return result;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public String InsertOnemonth(HttpSession session,String employee,String Datedebut,String Datefin,double base) {
+        // Met le paramètre year dans l'URL en GET
+        System.out.print(base);
+        String url = erpNextConfig.getApiUrl() + "/method/my_app.csv.fonction.generate_salary_slip_for_employee?employee=" + employee+"&start_date="+Datedebut+"&end_date="+Datefin+"&base="+base;
+        HttpHeaders headers = erpNextConfig.createHeaders(session);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+        try {
+                ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, request, Map.class);
+
+                if (response.getStatusCode().is2xxSuccessful()) {
+                    return response.getBody().get("message").toString();
+                } else {
+                    return "❌ Erreur Frappe : code HTTP " + response.getStatusCode();
+                }
+            } catch (Exception e) {
+                return "❌ Exception lors de l’appel Frappe : " + e.getMessage();
+            }
+    }
+    
+    public String generete_Salary_slip(HttpSession session, String debut, String fin,String Employername,double base){
+            YearMonth yearMonthdebut = YearMonth.parse(debut);
+            YearMonth yearMonthfin = YearMonth.parse(fin);
+            YearMonth courant=yearMonthdebut;
+            String result="Generate : ";
+            int count=0;
+            while (!courant.isAfter(yearMonthfin)){ 
+                String[] dates =DataService.getStartAndEndDateFromMonthInput(courant.format(DateTimeFormatter.ofPattern("yyyy-MM")));
+                String filters="[[\"employee\", \"=\", \"" + Employername + "\"], [\"start_date\", \">=\", \""+dates[0]+"\"], [\"start_date\", \"<=\", \""+ dates[1]+"\"]]";
+                List<String> fields = Arrays.asList("name", "status", "payroll_frequency", "net_pay", "start_date", "end_date","currency");
+                List<SalarySlip> emSlips=erpNextService.getListByFilterWithFields(session, "Salary Slip", filters, fields, SalarySlip.class);
+                if(emSlips.size()!=0){
+                     System.out.println("Il y a dejas une Salary Slip Pour ce mois"); 
+                }
+                else{
+                    result= InsertOnemonth( session, Employername, dates[0], dates[1],base);
+                    count++;
+                    System.out.println(result); 
+                }
+                courant=courant.plusMonths(1);
+            }
+            result=result.concat("on a creer Salary Slip  " + count);
+            return result;
     }
 
 

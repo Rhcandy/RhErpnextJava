@@ -15,6 +15,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
 import rhjava.erpnext.demo.service.DataService;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @Controller
 @RequestMapping("/data")
@@ -61,5 +63,24 @@ public class DataDbController {
         return "redirect:/data";
 
     }
+    
+    @GetMapping("/Generate")
+    public String postMethodName( 
+            @RequestParam(required = true) String Employername,
+            @RequestParam(required = true) String monthdebut,
+            @RequestParam(required = true) String monthfin,
+             @RequestParam() double base,
+            RedirectAttributes redirectAttributes,
+            Model model,
+            HttpSession session) {
+        try {
+            String message = DataService.generete_Salary_slip( session,  monthdebut,  monthfin, Employername,base); 
+            redirectAttributes.addFlashAttribute("message", message);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", e.getMessage());
+        }
+        return "redirect:/employee";
+    }
+    
     
 }

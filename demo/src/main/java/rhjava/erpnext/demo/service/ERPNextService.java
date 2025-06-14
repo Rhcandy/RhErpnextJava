@@ -205,12 +205,14 @@ public class ERPNextService {
             UriComponentsBuilder builder = UriComponentsBuilder
                 .fromHttpUrl(erpNextConfig.getApiUrl())
                 .pathSegment("resource", resource)
-                .queryParam("filters", filtersJson);
+                .queryParam("filters", filtersJson)
+                .queryParam("limit_page_length", 200);
+                
 
             // Ajouter tri si les paramètres sont valides
             if (orderBy != null && !orderBy.isEmpty() &&
                 orderType != null && (orderType.equalsIgnoreCase("asc") || orderType.equalsIgnoreCase("desc"))) {
-                builder.queryParam("order_by", orderBy + " " + orderType.toLowerCase());
+                builder.queryParam("order_by", orderBy + " " + orderType.toLowerCase()); // 
             }
 
             URI url = builder
