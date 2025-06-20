@@ -87,15 +87,11 @@ public class EmployeController {
         String filters = "[[\"employee\", \"=\", \"" + name + "\"]]";
         List<String> fields = Arrays.asList("name", "status", "payroll_frequency", "net_pay", "start_date", "end_date","currency");
         List<SalarySlip> emSlips=erpNextService.getListByFilterWithFields(session, "Salary Slip", filters, fields, SalarySlip.class);
-        List<Base> departements= erpNextService.getList(session, "Department", Base.class);
-        List<Base> designations= erpNextService.getList(session, "Designation", Base.class);
-
+      
         model.addAttribute("pageTitle", "Employee");
         model.addAttribute("activePage", "employee");
         model.addAttribute("salarySlipsList", emSlips);
         model.addAttribute("moredetail", (Employee) erpNextService.getDetail(session, "Employee", name, Employee.class));
-        model.addAttribute("departement", departements);
-        model.addAttribute("designation", designations);
         return "emp/more"; 
     }
 

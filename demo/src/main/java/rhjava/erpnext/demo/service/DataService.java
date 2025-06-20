@@ -173,8 +173,6 @@ public class DataService {
 
 
     public String InsertOnemonth(HttpSession session,String employee,String Datedebut,String Datefin,double base) {
-        // Met le paramètre year dans l'URL en GET
-        System.out.print(base);
         String url = erpNextConfig.getApiUrl() + "/method/my_app.csv.fonction.generate_salary_slip_for_employee?employee=" + employee+"&start_date="+Datedebut+"&end_date="+Datefin+"&base="+base;
         HttpHeaders headers = erpNextConfig.createHeaders(session);
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -216,6 +214,34 @@ public class DataService {
             result=result.concat("on a creer Salary Slip  " + count);
             return result;
     }
+    public String ajusterSSA(HttpSession session, String componentName, String comparaison, double seuil, double variationPercent) {
+        String url = erpNextConfig.getApiUrl() + "/method/my_app.csv.fonction.ajuster_ssa_selon_component";
+
+        // Créer les headers d’authentification
+        HttpHeaders headers = erpNextConfig.createHeaders(session);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Préparer le corps JSON avec les paramètres
+        Map<String, Object> body = new HashMap<>();
+        body.put("component_name", componentName);
+        body.put("comparaison", comparaison);  // "sup" ou "inf"
+        body.put("seuil", seuil);
+        body.put("variation_percent", variationPercent);  // ex: +10 ou -5
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, request, Map.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return response.getBody().get("message").toString();
+            } else {
+                return "❌ Erreur Frappe : code HTTP " + response.getStatusCode();
+            }
+        } catch (Exception e) {
+            return "❌ Exception lors de l’appel Frappe : " + e.getMessage();
+        }
+    }
+
 
 
 }

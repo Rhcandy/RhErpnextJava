@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpSession;
 import rhjava.erpnext.demo.model.Base;
 import rhjava.erpnext.demo.model.Employee;
+import rhjava.erpnext.demo.model.SalaryComponent;
 import rhjava.erpnext.demo.model.SalarySlip;
 import rhjava.erpnext.demo.service.DataService;
 import rhjava.erpnext.demo.service.ERPNextService;
@@ -30,6 +31,7 @@ public class StatistiqueController {
         String filters=DataService.getCurrentMonthDateRange();
 
         List<SalarySlip> salaryslips = new ArrayList<>();
+        List<Base> salarycomponents=erpNextService.getList(session, "Salary Component", Base.class);
         List<Employee> employees=erpNextService.getList(session, "Employee", Employee.class);
         List<Base> Bases=erpNextService.getListByFilter(session, "Salary Slip", filters, Base.class);
         double total=0;
@@ -38,12 +40,14 @@ public class StatistiqueController {
             salaryslips.add(one);
             total+=one.getNet_pay();
         }
+        model.addAttribute("components", salarycomponents);
         model.addAttribute("Total", total);
         model.addAttribute("CountSalary", salaryslips.size());
         model.addAttribute("CountEmployee", employees.size());
         model.addAttribute("data", salaryslips);
         model.addAttribute("pageTitle", "Recape Annuel");
         model.addAttribute("activePage", "recap");
+
         return "dashboard";
     }
     
@@ -68,6 +72,8 @@ public class StatistiqueController {
             salaryslips.add(one);
             total+=one.getNet_pay();
         }
+        List<Base> salarycomponents=erpNextService.getList(session, "Salary Component", Base.class);
+        model.addAttribute("components", salarycomponents);
         model.addAttribute("Total", total);
         model.addAttribute("CountSalary", salaryslips.size());
         model.addAttribute("CountEmployee", employees.size());

@@ -38,9 +38,9 @@ public class ERPNextService {
 
     public <T> List<T> getList(HttpSession session, String resource, Class<T> type) {
         try {
-            String encodedResource = URLEncoder.encode(resource, StandardCharsets.UTF_8.name());
+           
             URI url = UriComponentsBuilder.fromHttpUrl(erpNextConfig.getApiUrl())
-                .pathSegment("resource", encodedResource)
+                .pathSegment("resource", resource)
                 .queryParam("limit_page_length", 200)  // limite à 200 résultats
                 .build()
                 .encode(StandardCharsets.UTF_8)

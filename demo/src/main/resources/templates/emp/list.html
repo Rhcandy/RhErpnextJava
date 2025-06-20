@@ -75,12 +75,13 @@
                 <div class="col-12">
                 <div class="card mb-4 shadow-sm border-0">
                     <div class="card-body p-4">
+                        <h6>Generate Salary Slip</h6>
                         <form method="get" action="/data/Generate" class="row g-3 align-items-end">
                             <div class="col-12 col-md-6 col-lg-3">
                                 <label for="employeeName" class="form-label fw-bold small text-muted">Name</label>
                                  <select id="Employername" name="Employername" class="form-control" required>
                                     <option value="">Sélectionner un Employer</option>
-                                    <option th:each="emp : ${list}" th:value="${emp.name}" th:text="${emp.name}"></option>
+                                    <option th:each="emp : ${list}" th:value="${emp.name}" th:text="${emp.employee_name}+ ' ' +${emp.name} "></option>
                                 </select>
                             </div>
 
