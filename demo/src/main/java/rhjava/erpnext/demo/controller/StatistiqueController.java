@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpSession;
 import rhjava.erpnext.demo.model.Base;
 import rhjava.erpnext.demo.model.Employee;
-import rhjava.erpnext.demo.model.SalaryComponent;
 import rhjava.erpnext.demo.model.SalarySlip;
 import rhjava.erpnext.demo.service.DataService;
 import rhjava.erpnext.demo.service.ERPNextService;
@@ -23,8 +22,6 @@ import rhjava.erpnext.demo.service.ERPNextService;
 public class StatistiqueController {
     @Autowired
     private ERPNextService erpNextService;
-    @Autowired
-    private DataService dataservice;
 
     @GetMapping
     public String home(HttpSession session, Model model) {
