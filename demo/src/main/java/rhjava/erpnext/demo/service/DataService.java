@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpSession;
 import rhjava.erpnext.demo.config.ERPNextConfig;
+import rhjava.erpnext.demo.model.Base;
 import rhjava.erpnext.demo.model.SalarySlip;
 import rhjava.erpnext.demo.model.TotalAnnee;
 
@@ -157,6 +158,7 @@ public class DataService {
         return result;
     }
 
+  
 
 
 
@@ -169,9 +171,8 @@ public class DataService {
 
 
 
-
-    public String InsertOnemonth(HttpSession session,String employee,String Datedebut,String Datefin,double base) {
-        String url = erpNextConfig.getApiUrl() + "/method/my_app.csv.fonction.generate_salary_slip_for_employee?employee=" + employee+"&start_date="+Datedebut+"&end_date="+Datefin+"&base="+base;
+    public String InsertOnemonth(HttpSession session,String employee,String Datedebut,String Datefin,double base,String isEcraser) {
+        String url = erpNextConfig.getApiUrl() + "/method/my_app.csv.fonction.generate_salary_slip_for_employee?employee=" + employee+"&start_date="+Datedebut+"&end_date="+Datefin+"&base="+base+"&isEcraser="+isEcraser;
         HttpHeaders headers = erpNextConfig.createHeaders(session);
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Void> request = new HttpEntity<>(headers);
@@ -188,22 +189,32 @@ public class DataService {
             }
     }
     
-    public String generete_Salary_slip(HttpSession session, String debut, String fin,String Employername,double base){
+    public String generete_Salary_slip(HttpSession session, String debut, String fin,String Employername,double base,List<String> types){
             YearMonth yearMonthdebut = YearMonth.parse(debut);
             YearMonth yearMonthfin = YearMonth.parse(fin);
             YearMonth courant=yearMonthdebut;
             String result="Generate : ";
             int count=0;
+
+            if(types.contains("moyenne")){
+                base= getMoyenneSalaireBase(session);
+            }
+
             while (!courant.isAfter(yearMonthfin)){ 
                 String[] dates =DataService.getStartAndEndDateFromMonthInput(courant.format(DateTimeFormatter.ofPattern("yyyy-MM")));
                 String filters="[[\"employee\", \"=\", \"" + Employername + "\"], [\"start_date\", \">=\", \""+dates[0]+"\"], [\"start_date\", \"<=\", \""+ dates[1]+"\"]]";
                 List<String> fields = Arrays.asList("name", "status", "payroll_frequency", "net_pay", "start_date", "end_date","currency");
                 List<SalarySlip> emSlips=erpNextService.getListByFilterWithFields(session, "Salary Slip", filters, fields, SalarySlip.class);
-                if(emSlips.size()!=0){
+                String isEcraser="false";
+                
+                if(emSlips.size()!=0 && !types.contains("ecraser")) {
                      System.out.println("Il y a dejas une Salary Slip Pour ce mois"); 
                 }
                 else{
-                    result= InsertOnemonth( session, Employername, dates[0], dates[1],base);
+                    if (types.contains("ecraser")) {
+                        isEcraser="true";
+                    }
+                    result= InsertOnemonth( session, Employername, dates[0], dates[1],base,isEcraser);
                     count++;
                     System.out.println(result); 
                 }
@@ -240,6 +251,76 @@ public class DataService {
         }
     }
 
+    public List<SalarySlip> get_salary_By_Component(HttpSession session,String componentName, String comparaison, double seuil ) {
+        
+        List<SalarySlip> resultf = new ArrayList<>();
+        List<Base> result = new ArrayList<>();
+        // Met le paramètre year dans l'URL en GET
+        String url = erpNextConfig.getApiUrl() + "/method/my_app.csv.fonction.get_salary_slip";
+
+         // Créer les headers d’authentification
+        HttpHeaders headers = erpNextConfig.createHeaders(session);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Préparer le corps JSON avec les paramètres
+        Map<String, Object> body = new HashMap<>();
+        body.put("component_name", componentName);
+        body.put("comparaison", comparaison);  // "sup" ou "inf"
+        body.put("seuil", seuil);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+        
+
+        try {
+           ResponseEntity<LinkedHashMap> response = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                request,
+                new ParameterizedTypeReference<LinkedHashMap>() {}
+            );
+
+            ObjectMapper mapper = new ObjectMapper();
+            Object rawList = response.getBody().get("message");
+            List<LinkedHashMap> maps = (List<LinkedHashMap>) rawList;
+            for (LinkedHashMap map : maps) {
+                result.add(mapper.convertValue(map, Base.class));
+            }
+            for ( Base one : result){
+                resultf.add((SalarySlip)erpNextService.getDetail(session,"Salary Slip",one.getName(),SalarySlip.class));
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return resultf;
+    }
+
+
+    public  double getMoyenneSalaireBase(HttpSession session){
+        double result= 0.0;
+        String url = erpNextConfig.getApiUrl() + "/method/my_app.csv.fonction.get_salary_slip_moyenne";
+        System.err.println(url);
+        // Créer les headers d’authentification
+        HttpHeaders headers = erpNextConfig.createHeaders(session);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>( headers);
+      
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, request, Map.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                Object moyenne =response.getBody().get("message");
+                if (moyenne != null) {
+                    result= Double.parseDouble(moyenne.toString());
+                }
+            }
+            return result;
+       
+
+    }
+    
+
+    
 
 
 }

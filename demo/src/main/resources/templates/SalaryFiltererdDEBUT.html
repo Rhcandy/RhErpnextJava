@@ -1,0 +1,61 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{/general/headimport.html}"></head> 
+
+<body class="g-sidenav-show   bg-gray-100">
+  <div class="min-height-300 bg-dark position-absolute w-100"></div>
+    <th:block th:replace="~{/general/aside.html}"></th:block> 
+
+    <main class="main-content position-relative border-radius-lg ">
+      <!-- Navbar -->
+      <th:block th:replace="~{/general/navbar.html}"></th:block>
+      <!-- End Navbar -->
+      
+      <div class="container-fluid py-4">
+          <div class="row mt-4">
+            <div class="col-12">
+              <div class="card mb-4 p-3">
+                <form method="post" action="/data/FilterSalary">
+                  <div class="row align-items-end g-2">
+                    <div class="col-md-3">
+                      <label for="component" class="form-label">Components</label>
+                      <select id="component" name="component" class="form-control" required>
+                        <option value="">Sélectionner un component</option>
+                        <option th:each="comp : ${components}" th:value="${comp.name}" th:text="${comp.name}"></option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-2">
+                      <label class="form-label">Condition</label>
+                      <select class="form-select" name="condition" required>
+                        <option value="sup">Supérieur à</option>
+                        <option value="inf">Inférieur à</option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-2">
+                      <label class="form-label">Montant Seuil (€)</label>
+                      <input type="number" class="form-control" name="seuil" step="0.01" required>
+                    </div>
+
+                    <div class="col-md-2 text-end">
+                      <button type="submit" class="btn btn-success w-100">Rechercher</button>
+                    </div>
+                  </div>
+                </form>
+
+                <div th:if="${message}" class="alert alert-success alert-dismissible fade show mt-3 col-md-6 float-end" role="alert">
+                  <span class="alert-text" th:text="${message}"></span>
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </main>
+
+    <th:block th:replace="~{/general/fixed-plugin.html}"></th:block>
+ 
+
+<th:block th:replace="~{/general/footer.html}"></th:block>

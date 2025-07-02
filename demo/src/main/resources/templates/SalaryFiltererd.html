@@ -1,0 +1,171 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{/general/headimport.html}"></head> 
+
+<body class="g-sidenav-show   bg-gray-100">
+  <div class="min-height-300 bg-dark position-absolute w-100"></div>
+    <th:block th:replace="~{/general/aside.html}"></th:block> 
+
+    <main class="main-content position-relative border-radius-lg ">
+      <!-- Navbar -->
+      <th:block th:replace="~{/general/navbar.html}"></th:block>
+      <!-- End Navbar -->
+      
+      <div class="container-fluid py-4">
+          <div class="row mt-4">
+            <div class="col-12">
+              <div class="card mb-4 p-3">
+                <form method="post" action="/data/FilterSalary">
+                  <div class="row align-items-end g-2">
+                    <div class="col-md-3">
+                      <label for="component" class="form-label">Components</label>
+                      <select id="component" name="component" class="form-control" required>
+                        <option value="">Sélectionner un component</option>
+                        <option th:each="comp : ${components}" th:value="${comp.name}" th:text="${comp.name}"></option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-2">
+                      <label class="form-label">Condition</label>
+                      <select class="form-select" name="condition" required>
+                        <option value="sup">Supérieur à</option>
+                        <option value="inf">Inférieur à</option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-2">
+                      <label class="form-label">Montant Seuil (€)</label>
+                      <input type="number" class="form-control" name="seuil" step="0.01" required>
+                    </div>
+
+                    <div class="col-md-2 text-end">
+                      <button type="submit" class="btn btn-success w-100">Rechercher</button>
+                    </div>
+                  </div>
+                </form>
+
+                <div th:if="${message}" class="alert alert-success alert-dismissible fade show mt-3 col-md-6 float-end" role="alert">
+                  <span class="alert-text" th:text="${message}"></span>
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+              <div class="card mb-4">
+                  <div class="col-md-6 ms-auto d-flex justify-content-end p-2">
+                    <form method="get" action="/statistique/Tabrecap" class="d-flex gap-2 align-items-end">
+                      <div>
+                        <label for="month" class="form-label fw-bold small text-muted">Mois</label>
+                        <input type="month" name="month" id="month" class="form-control form-control-sm" placeholder="Month">
+                      </div>
+                      <div class="d-flex align-items-end">
+                        <button type="submit" class="btn btn-secondary btn-sm mb-1">Find</button>
+                      </div>
+                    </form>
+                  </div>
+
+                  <div class="card-header pb-0">
+                    <h3>Salary Slip</h3>
+                  </div>
+                  <div class="card-body px-0 pt-0 pb-2 mt-1" id="employee-container">
+                    <hr class="my-2" style="height:2px; background-color: black; border: none;">
+
+                    <div class="row" th:each="emp : ${data}">
+                        <!-- Colonne 1 : Infos principales -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 th:text="${emp.employee_name}" class="card-title">Information</h5>
+                                    <p class="mb-1"><strong>Code :</strong> <span th:text="${emp.name}"></span></p>
+                                    <p class="mb-1"><strong>Net Pay :</strong> <span th:text="${#numbers.formatDecimal(emp.net_pay, 0, 'COMMA', 2, 'POINT')} + ' ' + ${emp.currency}"></span></p>
+                                    <p class="mb-1"><strong>Gross Pay :</strong> <span th:text="${#numbers.formatDecimal(emp.gross_pay, 0, 'COMMA', 2, 'POINT')} + ' ' + ${emp.currency}"></span></p>
+                                    <p class="mb-1"><strong>Total Deduction :</strong> <span th:text="${#numbers.formatDecimal(emp.total_deduction, 0, 'COMMA', 2, 'POINT')} + ' ' + ${emp.currency}"></span></p>
+                                    <p class="mb-1"><strong>Month :</strong> <span th:text="${emp.getMois()}"></span></p>
+                                    <p class="mb-0"><strong>Status :</strong> <span th:text="${emp.status}"></span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Colonne 2 : Earnings / Deductions -->
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="text-muted text-uppercase small">Salary Structure</h6>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <h6 class="text-center text-success">Earnings</h6>
+                                            <table class="table table-sm " >
+                                                <tbody>
+                                                    <tr th:each="earn : ${emp.earnings}">
+                                                        <td th:text="${earn.salary_component}">Salaire de Base</td>
+                                                        <td th:text="${#numbers.formatDecimal(earn.default_amount, 0, 'COMMA', 2, 'POINT')} + ' ' + ${emp.currency}">0 MGA</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-6">
+                                            <h6 class="text-center text-danger">Deductions</h6>
+                                            <table class="table table-sm " >
+                                                <tbody>
+                                                    <tr th:each="deduct : ${emp.deductions}">
+                                                        <td th:text="${deduct.salary_component}">CNAPS</td>
+                                                        <td th:text="${#numbers.formatDecimal(deduct.default_amount, 0, 'COMMA', 2, 'POINT')} + ' ' + ${emp.currency}">0 MGA</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-2" style="height:2px; background-color: black; border: none;">
+
+                    </div>
+                  </div>
+                  <!-- Pagination controls -->
+                  <div class="d-flex justify-content-center mt-4">
+                      <button class="btn btn-sm btn-outline-primary me-2" onclick="prevPage()">Précédent</button>
+                      <span id="page-indicator" class="align-self-center"></span>
+                      <button class="btn btn-sm btn-outline-primary ms-2" onclick="nextPage()">Suivant</button>
+                  </div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </main>
+
+    <th:block th:replace="~{/general/fixed-plugin.html}"></th:block>
+    <script>
+      const itemsPerPage = 4; // nombre d'items par page
+      let currentPage = 1;
+
+      function showPage(page) {
+        const allRows = document.querySelectorAll('#employee-container > .row'); 
+        const totalPages = Math.ceil(allRows.length / itemsPerPage);
+
+        if (page < 1 || page > totalPages) return;
+
+        currentPage = page;
+
+        allRows.forEach((row, index) => {
+          row.style.display = (index >= (page - 1) * itemsPerPage && index < page * itemsPerPage) ? 'flex' : 'none';
+        });
+        document.getElementById('page-indicator').innerText = `Page ${currentPage} / ${totalPages}`;
+      }
+      function nextPage() {
+        showPage(currentPage + 1);
+      }
+      function prevPage() {
+        showPage(currentPage - 1);
+      }
+      document.addEventListener("DOMContentLoaded", () => {
+        showPage(1);
+      });
+    </script>
+
+<th:block th:replace="~{/general/footer.html}"></th:block>

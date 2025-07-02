@@ -2,6 +2,8 @@ package rhjava.erpnext.demo.controller;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -17,7 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
+import rhjava.erpnext.demo.model.Base;
+import rhjava.erpnext.demo.model.SalarySlip;
 import rhjava.erpnext.demo.service.DataService;
+import rhjava.erpnext.demo.service.ERPNextService;
+
 import org.springframework.web.bind.annotation.RequestBody;
 
 
@@ -26,6 +32,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class DataDbController {
     @Autowired
     private DataService DataService;
+    @Autowired
+    private ERPNextService erpNextService;
 
     @GetMapping
     public String Accueildata(HttpSession session,Model model) {
@@ -72,12 +80,16 @@ public class DataDbController {
             @RequestParam(required = true) String Employername,
             @RequestParam(required = true) String monthdebut,
             @RequestParam(required = true) String monthfin,
-             @RequestParam() double base,
+            @RequestParam() double base,
+            @RequestParam(value = "types",required = false) List<String> types,
             RedirectAttributes redirectAttributes,
             Model model,
             HttpSession session) {
         try {
-            String message = DataService.generete_Salary_slip( session,  monthdebut,  monthfin, Employername,base); 
+            if (types == null) {
+                types = new ArrayList<>(); 
+            }
+            String message = DataService.generete_Salary_slip( session,  monthdebut,  monthfin, Employername,base,types); 
             redirectAttributes.addFlashAttribute("message", message);
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("message", e.getMessage());
@@ -100,6 +112,35 @@ public class DataDbController {
             redirectAttributes.addFlashAttribute("message", message);
         }
         return "redirect:/statistique";
+    }
+    @PostMapping("/FilterSalary")
+    public String handleFormF(
+            @RequestParam("component") String component,
+            @RequestParam("condition") String condition,
+            @RequestParam("seuil") double seuil,
+            HttpSession session,
+            Model model) {
+            List<SalarySlip> Slips =DataService.get_salary_By_Component(session, component, condition, seuil) ;
+            List<Base> salarycomponents=erpNextService.getList(session, "Salary Component", Base.class);
+
+            model.addAttribute("components", salarycomponents);
+            model.addAttribute("data", Slips);
+            model.addAttribute("activePage", "filter");
+            model.addAttribute("pageTitle", "Salary Slip");
+         
+        return "SalaryFiltererd";
+    }
+
+    @GetMapping("/FilterSalarydebut")
+    public String handleFormF(
+            HttpSession session,
+            Model model) {
+            List<Base> salarycomponents=erpNextService.getList(session, "Salary Component", Base.class);
+            model.addAttribute("components", salarycomponents);
+            model.addAttribute("activePage", "filter");
+            model.addAttribute("pageTitle", "Salary Slip");
+         
+        return "SalaryFiltererdDEBUT";
     }
     
     
